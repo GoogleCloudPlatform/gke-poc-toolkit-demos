@@ -571,17 +571,36 @@ First setup a while loop that curls the frontend api and returns the GCP zone of
 while true; do curl https://whereami.endpoints.${GKE_PROJECT_ID}.cloud.goog/zone; echo ;  sleep 1; done
 ```
 
-Set an envar for the region in which that zone resides. For example, if the zone returned from a curl is us-east1-c set the region to us-east1.
+Start up a second terminal. Set an envar for the region in which that zone resides. For example, if the zone returned from a curl is us-east1-c set the region to us-east1.
 ```bash
 export CLOSEST_REGION=us-east1
 ```
 
-Start up a second terminal and scale the Frontend service in that region to zero.
+To simulate a regional failure, we will drain the network endpoint group if the closest region.
 ```bash
-kubectl scale deploy whereami-frontend -n default --context gke_${GKE_PROJECT}_${CLOSEST_REGION}_gke-east --replicas 0 
+export BACKEND_SERVICE=$(gcloud compute backend-services list --format="value(NAME)" --filter=name:'mci')
+export NEG=$(gcloud compute network-endpoint-groups list --filter=zone:${CLOSEST_REGION} --format="value(NAME)" | head -1)
+for NEG_ZONE in $(gcloud compute network-endpoint-groups list --filter=zone:${CLOSEST_REGION} --format="value(LOCATION)")
+do
+  echo ${NEG_ZONE}
+  gcloud compute backend-services update-backend ${BACKEND_SERVICE} \
+    --global --network-endpoint-group=${NEG} \
+    --network-endpoint-group-zone ${NEG_ZONE} --max-rate 0
+done
 ```
 
-Observe that the curl will start sending traffic to other GCP regions as soon as the last pod in your closest region terminates. After a few seconds the self healing nature of config sync re-deploys the pods in your region and traffic is routed back to that same region.
+The drain takes roughly 3 minutes, but once in effect, observe that the curl will start sending traffic to other GCP regions. Go ahead and bring the closest region back into the LB.
+
+```bash
+for NEG_ZONE in $(gcloud compute network-endpoint-groups list --filter=zone:${CLOSEST_REGION} --format="value(LOCATION)")
+do
+  echo ${NEG_ZONE}
+  gcloud compute backend-services update-backend ${BACKEND_SERVICE} \
+    --global --network-endpoint-group=${NEG} \
+    --network-endpoint-group-zone ${NEG_ZONE} --max-rate 100
+done
+```
+
 
 14. **Validate Service to Service regional failover AKA East/West failover**
 First setup a while loop that curls the frontend api and returns the GCP zone of the frontend and backend pods you get routed to.
