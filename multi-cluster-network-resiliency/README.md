@@ -128,7 +128,7 @@ metadata:
     istio.io/rev: asm-managed
 EOF
 
-cat <<EOF > ${ACM_REPO_DIR}/default-namespace.yaml
+cat <<EOF > ${ACM_REPO_DIR}/asm-gateway-namespace.yaml
 apiVersion: v1
 kind: Namespace
 metadata:
