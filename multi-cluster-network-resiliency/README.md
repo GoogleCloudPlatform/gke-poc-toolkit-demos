@@ -236,8 +236,8 @@ metadata:
   namespace: asm-gateways
   annotations:
     networking.gke.io/static-ip: "${GCLB_IP}"
-    # networking.gke.io/pre-shared-certs: "${WHEREAMI_MANAGED_CERT}"
-    configsync.gke.io/cluster-name-selector: "gke-central-membership"
+    networking.gke.io/pre-shared-certs: "${WHEREAMI_MANAGED_CERT}"
+    # configsync.gke.io/cluster-name-selector: "gke-central-membership"
 spec:
   template:
     spec:
@@ -255,7 +255,7 @@ metadata:
   annotations:
     beta.cloud.google.com/backend-config: '{"ports": {"443":"asm-ingress-xlb-config"}}'
     networking.gke.io/app-protocols: '{"http2":"HTTP2"}'
-    configsync.gke.io/cluster-name-selector: "gke-central-membership"
+    # configsync.gke.io/cluster-name-selector: "gke-central-membership"
 spec:
   template:
     spec:
@@ -583,6 +583,10 @@ spec:
       interval: 1s
       baseEjectionTime: 1m
 EOF
+
+git add .
+git commit -m "Deploy Istio destination rules." 
+git push origin main
 ```
 
 13. **Validate Gateway regional failover AKA North/South failover**
