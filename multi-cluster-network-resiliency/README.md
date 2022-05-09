@@ -379,6 +379,8 @@ kind: DestinationRule
 metadata:
   name: whereami-frontend-destrule-cluster-central
   namespace: default
+  annotations:
+    configsync.gke.io/cluster-name-selector: "gke-central-membership"
 spec:
   host: whereami-frontend.default.svc.cluster.local
   trafficPolicy:
@@ -407,6 +409,8 @@ kind: DestinationRule
 metadata:
   name: whereami-frontend-destrule-cluster-west
   namespace: default
+  annotations:
+    configsync.gke.io/cluster-name-selector: "gke-west-membership"
 spec:
   host: whereami-frontend.default.svc.cluster.local
   trafficPolicy:
@@ -435,6 +439,8 @@ kind: DestinationRule
 metadata:
   name: whereami-frontend-destrule-cluster-eu
   namespace: default
+   annotations:
+    configsync.gke.io/cluster-name-selector: "gke-eu-north-membership"
 spec:
   host: whereami-frontend.default.svc.cluster.local
   trafficPolicy:
@@ -463,6 +469,8 @@ kind: DestinationRule
 metadata:
   name: whereami-backend-destrule-cluster-east
   namespace: default
+  annotations:
+    configsync.gke.io/cluster-name-selector: "gke-east-membership"
 spec:
   host: whereami-backend.default.svc.cluster.local
   trafficPolicy:
@@ -491,6 +499,8 @@ kind: DestinationRule
 metadata:
   name: whereami-backend-destrule-cluster-central
   namespace: default
+  annotations:
+    configsync.gke.io/cluster-name-selector: "gke-central-membership"
 spec:
   host: whereami-backend.default.svc.cluster.local
   trafficPolicy:
@@ -519,6 +529,8 @@ kind: DestinationRule
 metadata:
   name: whereami-backend-destrule-cluster-west
   namespace: default
+  annotations:
+    configsync.gke.io/cluster-name-selector: "gke-west-membership"
 spec:
   host: whereami-backend.default.svc.cluster.local
   trafficPolicy:
@@ -547,6 +559,8 @@ kind: DestinationRule
 metadata:
   name: whereami-backend-destrule-cluster-eu
   namespace: default
+  annotations:
+    configsync.gke.io/cluster-name-selector: "gke-eu-north-membership"
 spec:
   host: whereami-backend.default.svc.cluster.local
   trafficPolicy:
