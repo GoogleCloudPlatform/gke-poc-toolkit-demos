@@ -1,0 +1,17 @@
+apiVersion: networking.gke.io/v1beta1
+kind: MultiClusterService
+metadata:
+  name: asm-ingressgateway-xlb-multicluster-svc
+  namespace: asm-gateways
+  annotations:
+    beta.cloud.google.com/backend-config: '{"ports": {"443":"asm-ingress-xlb-config"}}'
+    networking.gke.io/app-protocols: '{"http2":"HTTP2"}'
+spec:
+  template:
+    spec:
+      selector:
+        asm: ingressgateway-xlb
+      ports:
+      - name: http2
+        protocol: TCP
+        port: 443 # Port the Service listens on
