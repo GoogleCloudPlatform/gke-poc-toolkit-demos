@@ -38,9 +38,9 @@ gcloud beta container --project ${PROJECT_ID} clusters create ${CLUSTER_NAME} \
   --autoscaling-profile optimize-utilization \
   --workload-pool "${PROJECT_ID}.svc.id.goog" \
   --enable-image-streaming --node-locations ${CLUSTER_LOCATION}
-  --enable-resource-consumption-metering \
-  --security-group "gke-security-groups@nickeberts.altostrat.com" \
-  --resource-usage-bigquery-dataset "gke_usage_metering" \
+  # --enable-resource-consumption-metering \
+  # --security-group "gke-security-groups@nickeberts.altostrat.com" \
+  # --resource-usage-bigquery-dataset "gke_usage_metering" \
 
 
 gcloud container clusters get-credentials ${CLUSTER_NAME} --zone ${CLUSTER_LOCATION} --project ${PROJECT_ID}
