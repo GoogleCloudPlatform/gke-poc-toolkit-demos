@@ -1,8 +1,0 @@
-apiVersion: networking.gke.io/v1beta1
-kind: FrontendConfig
-metadata:
-  name: argocd-frontend-config
-  namespace: argocd
-spec:
-  redirectToHttps:
-    enabled: true

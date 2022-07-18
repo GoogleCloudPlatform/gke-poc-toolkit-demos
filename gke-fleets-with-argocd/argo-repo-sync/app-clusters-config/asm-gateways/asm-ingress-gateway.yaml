@@ -1,0 +1,17 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: asm-ingress-gateway-xlb
+spec:
+  selector:
+    asm: ingressgateway-xlb # use ASM external ingress gateway
+  servers:
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    hosts:
+    - '*' # IMPORTANT: Must use wildcard here when using SSL, see note below
+    tls:
+      mode: SIMPLE
+      credentialName: edge2mesh-credential

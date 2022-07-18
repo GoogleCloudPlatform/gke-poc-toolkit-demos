@@ -1,0 +1,37 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+  name: asm-webhook-wait-job
+  namespace: istio-system
+spec:
+  template:
+    spec:
+      containers:
+        - image: bitnami/kubectl:1.24.3
+          command:
+            - /bin/bash
+            - -c
+            - |
+              export HOME=/tmp/webhook-test
+              echo ""
+              echo -n "Waiting for the ASM MCP webhook to install."
+              sleep $SLEEP
+              until kubectl get mutatingwebhookconfigurations istiod-asm-managed
+              do
+                echo -n "...still waiting for ASM MCP webhook creation"
+                sleep $SLEEP
+              done
+              echo "DONE"
+          imagePullPolicy: Always
+          name: asm-webhook-wait-job
+          env:
+          - name: SLEEP
+            value: "5"
+      dnsPolicy: ClusterFirst
+      restartPolicy: OnFailure
+      serviceAccountName: asm-webhook-wait-job-sa
+      terminationGracePeriodSeconds: 30

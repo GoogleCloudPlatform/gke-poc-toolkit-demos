@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: whereami
+  labels:
+    istio.io/rev: asm-managed
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"

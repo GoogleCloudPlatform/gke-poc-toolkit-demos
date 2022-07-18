@@ -1,0 +1,8 @@
+# apiVersion: v1
+# kind: Namespace
+# metadata:
+#   name: prod-tools
+#   annotations:
+#     iam.gke.io/gcp-service-account: gmp-sa@argo-sp.iam.gserviceaccount.com
+#     argocd.argoproj.io/sync-wave: "-1"
+
