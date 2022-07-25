@@ -424,8 +424,7 @@ git push
 4. **Now we have everything set so that when add a new GKE cluster and join it to argocd with the right label an ASM GW and whereami will be deployed. I wrote a quick bash script to that adds a cluster, registers it to the GKE Fleet, and joins it to ArgoCD.**
 ```bash
 
-../scripts/fleet_cluster_add.sh -p ${GKE_PROJECT_ID} -n gke-std-central01 -l us-central1-b -c "172.16.10.0/28"
-```
+../scripts/fleet_cluster_add.sh -p ${GKE_PROJECT_ID} -n gke-std-central01 -l us-central1-b -c "172.16.10.0/28" -t "autopilot" -w two```
 
 
 
