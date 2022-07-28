@@ -138,13 +138,13 @@ ARGOCD_SECRET=$(kubectl -n argocd get secret argocd-initial-admin-secret -o json
 echo "Logging into to argocd."
 argocd login "argocd.endpoints.${PROJECT_ID}.cloud.goog" --username admin --password ${ARGOCD_SECRET} --grpc-web
 argocd cluster add mccp-central-01 --in-cluster --label=env="multi-cluster-controller" --grpc-web -y
-cd ../argo-repo-sync && export SYNC_DIR=`pwd`
+cd argo-repo-sync 
 git init
 gh repo create ${SYNC_REPO} --private --source=. --remote=upstream
 REPO="https://github.com/"$(gh repo list | grep ${SYNC_REPO} | awk '{print $1}')
-find ${SYNC_DIR}/ -type f -exec sed -i '' -e "s/{{GKE_PROJECT_ID}}/${PROJECT_ID}/g" {} +
-find ${SYNC_DIR}/ -type f -exec sed -i '' -e "s/{{ASM_GW_IP}}/${ASM_GW_IP}/g" {} +
-find ${SYNC_DIR}/ -type f -exec sed -i '' -e "s|{{SYNC_REPO}}|${REPO}|g" {} +
+find ./ -type f -exec sed -i '' -e "s/{{GKE_PROJECT_ID}}/${PROJECT_ID}/g" {} +
+find ./ -type f -exec sed -i '' -e "s/{{ASM_GW_IP}}/${ASM_GW_IP}/g" {} +
+find ./ -type f -exec sed -i '' -e "s|{{SYNC_REPO}}|${REPO}|g" {} +
 
 git add . && git commit -m "Initial commit"
 git push --set-upstream upstream main

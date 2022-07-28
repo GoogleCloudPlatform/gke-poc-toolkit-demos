@@ -19,7 +19,7 @@ First you need to create a github PAT token. Here is a link that explains how. h
 PAT_TOKEN=""
 # Name for the private github repo that will be created
 REPO=""
-./scripts/fleet_prep.sh -p ${GKE_PROJECT_ID} -r ${REPO} -p ${PAT_TOKEN}
+./scripts/fleet_prep.sh -p ${GKE_PROJECT_ID} -r ${REPO} -t ${PAT_TOKEN}
 # Get your temp argocd admin password
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
 # Update your argocd admin password.
