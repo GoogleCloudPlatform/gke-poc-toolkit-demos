@@ -1,20 +1,20 @@
-# apiVersion: argoproj.io/v1alpha1
-# kind: ClusterAnalysisTemplate
-# metadata:
-#   name: success-rate
-# spec:
-#   args:
-#   - name: service-name
-#   metrics:
-#   - name: success-rate
-#     successCondition: len(result) == 0 || result[0] >= 0.95
-#     provider:
-#       prometheus:
-#         address: "http://prometheus-frontend.prod-tools.svc.cluster.local:9090"
-#         query: |
-#           sum(increase(
-#             istio_io:service_client_request_count{monitored_resource="istio_canonical_service",destination_service_name=~"rollouts-demo-canary",response_code="200"}[3m]
-#           )) / 
-#           sum(increase(
-#             istio_io:service_client_request_count{monitored_resource="istio_canonical_service",destination_service_name=~"rollouts-demo-canary"}[3m]
-#           ))
+apiVersion: argoproj.io/v1alpha1
+kind: ClusterAnalysisTemplate
+metadata:
+  name: success-rate
+spec:
+  args:
+  - name: service-name
+  metrics:
+  - name: success-rate
+    successCondition: len(result) == 0 || result[0] >= 0.95
+    provider:
+      prometheus:
+        address: "http://prometheus-frontend.prod-tools.svc.cluster.local:9090"
+        query: |
+          sum(increase(
+            istio_io:service_client_request_count{monitored_resource="istio_canonical_service",destination_service_name=~"rollouts-demo-canary",response_code="200"}[3m]
+          )) / 
+          sum(increase(
+            istio_io:service_client_request_count{monitored_resource="istio_canonical_service",destination_service_name=~"rollouts-demo-canary"}[3m]
+          ))

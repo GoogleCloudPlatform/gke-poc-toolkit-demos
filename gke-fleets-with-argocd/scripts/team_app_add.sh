@@ -54,7 +54,9 @@ if [[ ${WAVE} == "one" ]]; then
 
     kubectl apply -f ../argo-repo-sync/teams/${TEAM_NAME}/argocd-project.yaml -n argocd --context mccp-central-01
     kubectl apply -f ../argo-repo-sync/generators/${TEAM_NAME}-${APP_NAME}-applicationset-wave-1.yaml -n argocd --context mccp-central-01
-    echo "Added application ${APP_NAME} to team ${TEAM_NAME} and deployed to wave 1 clusters."
+    kubectl apply -f ../argo-repo-sync/generators/${TEAM_NAME}-${APP_NAME}-applicationset-wave-2.yaml -n argocd --context mccp-central-01
+
+    echo "Added application ${APP_NAME} to team ${TEAM_NAME} and staged for wave one and two clusters."
 else
     kubectl apply -f ../argo-repo-sync/generators/${TEAM_NAME}-${APP_NAME}-applicationset-wave-2.yaml -n argocd --context mccp-central-01
     echo "Rolled out application ${APP_NAME} to wave 2 clusters."

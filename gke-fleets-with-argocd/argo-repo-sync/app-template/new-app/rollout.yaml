@@ -6,12 +6,12 @@ spec:
   replicas: 1
   strategy:
     canary:
-      canaryService: app-1-canary
-      stableService: app-1-stable
+      canaryService: APP_NAME-canary
+      stableService: APP_NAME-stable
       trafficRouting:
         istio:
           virtualServices:
-          - name: app-1-virtualservice # At least one virtualService is required
+          - name: APP_NAME-virtualservice # At least one virtualService is required
             routes:
             - primary # At least one route is required
       steps:
@@ -24,7 +24,7 @@ spec:
             clusterScope: true
           args:
           - name: service-name
-            value: app-1-canary.team-1-app-1.svc.cluster.local
+            value: APP_NAME-canary.APP_NAME.svc.cluster.local
       - setWeight: 80
       - pause:
           duration: 4m
@@ -34,20 +34,20 @@ spec:
             clusterScope: true
           args:
           - name: service-name
-            value: app-1-canary.team-1-app-1.svc.cluster.local
+            value: APP_NAME-canary.APP_NAME.svc.cluster.local
   revisionHistoryLimit: 2
   selector:
     matchLabels:
-      app: app-1
+      app: APP_NAME
   template:
     metadata:
       labels:
-        app: app-1
+        app: APP_NAME
         istio-injection: enabled
     spec:
       containers:
-      - name: app-1
-        image: gcr.io/google-samples/whereami:v1.2.6
+      - name: APP_NAME
+        image: APP_IMAGE
         ports:
         - name: http
           containerPort: 8080

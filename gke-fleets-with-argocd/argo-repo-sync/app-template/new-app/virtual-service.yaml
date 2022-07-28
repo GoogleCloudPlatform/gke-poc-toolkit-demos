@@ -1,22 +1,23 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: virtualservice
+  name: APP_NAME-virtualservice
+  namespace: APP_NAME
 spec:
   gateways:
   - asm-gateways/asm-ingress-gateway-xlb
   hosts:
-  - hostname # example frontend.endpoints.argo-sp.cloud.goog
+  - APP_HOST_NAME
   http:
   - name: primary
     route:
     - destination:
-        host: app-name-stable
+        host: APP_NAME-stable
         port:
           number: 80
       weight: 100
     - destination:
-        host: app-name-canary
+        host: APP_NAME-canary
         port:
           number: 80
       weight: 0

@@ -3,4 +3,3 @@ resources:
 - rbac.yaml
 - service-canary.yaml
 - service-stable.yaml
-- virtualsvc.yaml
