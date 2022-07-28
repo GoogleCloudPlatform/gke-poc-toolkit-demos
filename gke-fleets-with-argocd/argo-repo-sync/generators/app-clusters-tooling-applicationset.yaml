@@ -1,0 +1,43 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: app-clusters-config-generator
+spec:
+  generators:
+  - matrix:
+      generators:
+        - git:
+            repoURL: {{SYNC_REPO}}
+            revision: HEAD
+            directories:
+              - path: app-clusters-config/*
+        - clusters:
+            selector:
+              matchLabels:
+                env: "prod"
+  template:
+    metadata:
+      name: '{{name}}-{{path.basename}}'
+    spec:
+      project: "admin"
+      source:
+        repoURL: {{SYNC_REPO}}
+        targetRevision: HEAD
+        path: '{{path}}'
+      destination:
+        server: '{{server}}' # 'server' field of the secret
+        namespace: '{{path.basename}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+          allowEmpty: true
+        syncOptions:
+          - CreateNamespace=true
+          - Validate=false
+        retry:
+          limit: 20
+          backoff:
+            duration: 5s
+            factor: 2
+            maxDuration: 5m

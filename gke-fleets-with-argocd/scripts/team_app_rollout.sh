@@ -26,6 +26,7 @@ cd $script_dir/../argo-repo-sync
 APP_DIR=../argo-repo-sync/teams/${TEAM_NAME}/${APP_NAME}/
 if [[ ${WAVE} == "one" ]]; then
     git checkout wave-one
+    git merge main
     sed -i '' -e "s|image: ${APP_IMAGE}:.*|image: ${APP_IMAGE}:${APP_IMAGE_TAG}|g" ${APP_DIR}rollout.yaml
     git add . && git commit -m "Updated application ${APP_NAME} image tag to ${APP_IMAGE}:${APP_IMAGE_TAG} on wave ${WAVE} clusters."
     git push 

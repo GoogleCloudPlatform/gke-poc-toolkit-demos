@@ -1,22 +1,19 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Rollout
 metadata:
-  name: rollouts-demo
+  name: rollout
 spec:
   replicas: 1
   strategy:
     canary:
-      canaryService: rollouts-demo-canary
-      stableService: rollouts-demo-stable
+      canaryService: APP_NAME-canary
+      stableService: APP_NAME-stable
       trafficRouting:
         istio:
           virtualServices:
-          - name: rollouts-demo-vsvc1 # At least one virtualService is required
+          - name: APP_NAME-virtualservice # At least one virtualService is required
             routes:
             - primary # At least one route is required
-          # - name: rollouts-demo-vsvc2
-          #   routes:
-          #   - secondary # At least one route is required
       steps:
       - setWeight: 20
       - pause:
@@ -27,7 +24,7 @@ spec:
             clusterScope: true
           args:
           - name: service-name
-            value: rollouts-demo-canary.bookinfo.svc.cluster.local
+            value: APP_NAME-canary.APP_NAME.svc.cluster.local
       - setWeight: 80
       - pause:
           duration: 4m
@@ -37,20 +34,20 @@ spec:
             clusterScope: true
           args:
           - name: service-name
-            value: rollouts-demo-canary.bookinfo.svc.cluster.local
+            value: APP_NAME-canary.APP_NAME.svc.cluster.local
   revisionHistoryLimit: 2
   selector:
     matchLabels:
-      app: rollouts-demo
+      app: APP_NAME
   template:
     metadata:
       labels:
-        app: rollouts-demo
+        app: APP_NAME
         istio-injection: enabled
     spec:
       containers:
-      - name: rollouts-demo
-        image: argoproj/rollouts-demo:green
+      - name: APP_NAME
+        image: APP_IMAGE
         ports:
         - name: http
           containerPort: 8080

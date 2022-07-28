@@ -1,0 +1,34 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: west-clusters-config-generator
+spec:
+  generators:
+    - clusters:
+        selector:
+          matchLabels:
+            region: "us-west1"
+  template:
+    metadata:
+      name: '{{name}}-configs'
+    spec:
+      project: "admin"
+      source:
+        repoURL: {{SYNC_REPO}}
+        targetRevision: HEAD
+        path: region-clusters-config/us-west-clusters-config
+      destination:
+        server: '{{server}}' # 'server' field of the secret
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+          allowEmpty: true
+        syncOptions:
+          - Validate=false
+        retry:
+          limit: 20
+          backoff:
+            duration: 5s
+            factor: 2
+            maxDuration: 5m

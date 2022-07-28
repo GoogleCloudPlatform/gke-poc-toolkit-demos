@@ -101,7 +101,7 @@ metadata:
     networking.gke.io/managed-certificates: argocd-managed-cert
 spec:
   rules:
-    - host: "arogcd.endpoints.${GKE_PROJECT_ID}.cloud.goog"
+    - host: "argocd.endpoints.${GKE_PROJECT_ID}.cloud.goog"
       http:
         paths:
         - pathType: Prefix
@@ -115,7 +115,7 @@ EOF
 
 kubectl apply -k argo-cd-gke
 ARGOCD_SECRET=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo)
-argocd login "arogcd.endpoints.${GKE_PROJECT_ID}.cloud.goog" --username admin --password ${ARGOCD_SECRET} --grpc-web
+argocd login "argocd.endpoints.${GKE_PROJECT_ID}.cloud.goog" --username admin --password ${ARGOCD_SECRET} --grpc-web
 argocd cluster add mccp-central-01 --in-cluster --label=env="multi-cluster-controller" --grpc-web -y
 
 ## Update your admin password
@@ -123,7 +123,6 @@ argocd account update-password --grpc-web
 
 ## Create ArgoCD Project for platform team and app team
 kubectl apply -f admin-argocd-project.yaml --context ${CLUSTER_NAME}
-kubectl apply -f team-1-argocd-project.yaml --context ${CLUSTER_NAME}
 ``` 
 
 10. **Setup a git repo for argocd to sync from. I am going to create a private github repo using the githubcli and setup credtials for that repo. If you plan on using a different git service make sure you adjust these steps for auth with that service.**
@@ -425,10 +424,3 @@ git push
 ```bash
 
 ../scripts/fleet_cluster_add.sh -p ${GKE_PROJECT_ID} -n gke-std-central01 -l us-central1-b -c "172.16.10.0/28" -t "autopilot" -w two```
-
-
-
-
-
-
-
