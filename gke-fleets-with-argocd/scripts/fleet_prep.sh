@@ -17,6 +17,14 @@ echo "::Variable set::"
 echo "PROJECT_ID: ${PROJECT_ID}"
 echo "SYNC_REPO: ${SYNC_REPO}"
 
+### Download config repo ###
+git clone git@github.com:GoogleCloudPlatform/gke-poc-toolkit-demos.git && cd gke-poc-toolkit-demos
+git checkout remotes/origin/gke-fleets-with-argocd
+cd -
+cp -rf gke-fleets-with-argocd/argo-repo-sync ./
+rm -rf gke-poc-toolkit-demos
+
+
 ### ArgoCD Install###
 echo "Setting up ArgoCD on the mccp cluster including configure it for GKE Ingress."
 gcloud compute addresses create argocd-ip --global --project ${GKE_PROJECT_ID}
