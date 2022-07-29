@@ -142,8 +142,8 @@ git add . && git commit -m "Initial commit"
 git push --set-upstream upstream main
 argocd repo add ${REPO} --username doesnotmatter --password ${PAT_TOKEN} --grpc-web
 
-### Setup mccp applicationset ###
-kubectl apply -f generators/multi-cluster-controller-applicationset.yaml -n argocd --context mccp-central-01
+### Setup applicationsets ###
+kubectl apply -f generators/ -n argocd --context mccp-central-01
 
 ### Binding GCP RBAC to the ARGOCD service accounts
 gcloud projects add-iam-policy-binding ${PROJECT_ID} --role "roles/container.admin" --member "serviceAccount:${PROJECT_ID}.svc.id.goog[argocd/argocd-server]"

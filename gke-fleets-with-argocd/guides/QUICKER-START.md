@@ -25,3 +25,10 @@ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.pas
 # Update your argocd admin password.
 argocd account update-password --grpc-web
 ```
+
+## Promoting Clusters to the Fleet
+
+1. **Run the application cluster add script**
+```bash
+./scripts/fleet_cluster_add.sh -p ${GKE_PROJECT_ID} -n gke-std-west01 -l us-west1-b -c "172.16.10.0/28" -t "standard" -w one
+```

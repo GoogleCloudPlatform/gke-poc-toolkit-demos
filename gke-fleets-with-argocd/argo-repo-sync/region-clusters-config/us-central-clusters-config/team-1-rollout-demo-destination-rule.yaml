@@ -1,0 +1,22 @@
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: rollout-demo-destrule
+  namespace: rollout-demo
+spec:
+  host: rollout-demo-stable.rollout-demo.svc.cluster.local
+  trafficPolicy:
+    connectionPool:
+      http:
+        maxRequestsPerConnection: 1
+    loadBalancer:
+      simple: ROUND_ROBIN
+      localityLbSetting:
+        enabled: true
+        failover:
+          - from: us-central1
+            to: us-west1
+    outlierDetection:
+      consecutive5xxErrors: 1
+      interval: 1s
+      baseEjectionTime: 1m

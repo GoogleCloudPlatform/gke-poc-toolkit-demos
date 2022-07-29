@@ -1,0 +1,22 @@
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: whereami-destrule
+  namespace: whereami
+spec:
+  host: whereami-stable.whereami.svc.cluster.local
+  trafficPolicy:
+    connectionPool:
+      http:
+        maxRequestsPerConnection: 1
+    loadBalancer:
+      simple: ROUND_ROBIN
+      localityLbSetting:
+        enabled: true
+        failover:
+          - from: us-east1
+            to: us-central1
+    outlierDetection:
+      consecutive5xxErrors: 1
+      interval: 1s
+      baseEjectionTime: 1m
