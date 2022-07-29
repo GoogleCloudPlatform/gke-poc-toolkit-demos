@@ -118,14 +118,6 @@ EOF
 
 gcloud endpoints services deploy whereami-openapi.yaml --project ${PROJECT_ID}
 
-echo "Creating certificates for whereami and rollout demo apps."
-gcloud compute ssl-certificates create whereami-cert \
-    --domains=whereami.endpoints.${PROJECT_ID}.cloud.goog \
-    --global
-gcloud compute ssl-certificates create rollout-demo-cert \
-    --domains=rollout-demo.endpoints.${PROJECT_ID}.cloud.goog \
-    --global
-
 ### Setup Sync Repo w/ Argocd ###
 echo "Waiting for managed cert to become Active, this can take about 5 mins."
 
@@ -152,6 +144,18 @@ argocd repo add ${REPO} --username doesnotmatter --password ${PAT_TOKEN} --grpc-
 
 ### Setup mccp applicationset ###
 kubectl apply -f generators/multi-cluster-controller-applicationset.yaml -n argocd --context mccp-central-01
+
+### Binding GCP RBAC to the ARGOCD service accounts
+gcloud projects add-iam-policy-binding ${PROJECT_ID} --role "roles/container.admin" --member "serviceAccount:${PROJECT_ID}.svc.id.goog[argocd/argocd-server]"
+gcloud projects add-iam-policy-binding ${PROJECT_ID} --role "roles/container.admin" --member "serviceAccount:${PROJECT_ID}.svc.id.goog[argocd/argocd-application-controller]"
+
+echo "Creating certificates for whereami and rollout demo apps."
+gcloud compute ssl-certificates create whereami-cert \
+    --domains=whereami.endpoints.${PROJECT_ID}.cloud.goog \
+    --global
+gcloud compute ssl-certificates create rollout-demo-cert \
+    --domains=rollout-demo.endpoints.${PROJECT_ID}.cloud.goog \
+    --global
 
 echo "The Fleet has been configured, checkout the sync status here:"
 echo "https://argocd.endpoints.${PROJECT_ID}.cloud.goog"
