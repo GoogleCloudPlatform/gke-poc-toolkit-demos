@@ -2,8 +2,9 @@
 This demo shows you how to bootstrap a Fleet of GKE clusters using ArgoCD as your gitops engine.
 
 ## Fleet Cluster setup
+So far we have the infrastructure laid out and now need to setup the multi cluster controller cluster with argocd, GKE Fleet componenents, and some other tooling needed for the demo. 
 
-1. **Clone the demo repo and copy folders that are required**
+1. **Clone the demo repo and copy folders the house dry configs for this demo.**
 ```bash
 git clone git@github.com:GoogleCloudPlatform/gke-poc-toolkit-demos.git  
 cp -rf gke-poc-toolkit-demos/gke-fleets-with-argocd/argo-repo-sync ./
@@ -12,7 +13,7 @@ cp -rf gke-poc-toolkit-demos/gke-fleets-with-argocd/scripts ./
 rm -rf gke-poc-toolkit-demos
 ```
 
-2. **Run the Fleet prep script**
+2. **Hydrate those configs with our project specific variable by running the Fleet prep script**
 First you need to create a github PAT token. Here is a link that explains how. https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
 ```bash
 # Create a var for your PAT token 
@@ -26,9 +27,86 @@ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.pas
 argocd account update-password --grpc-web
 ```
 
-## Promoting Clusters to the Fleet
+## Promoting Application Clusters to the Fleet
+Now that we have the multi cluster controller cluster setup, we need to create and promote a GKE cluster to the Fleet that will run applications. Since the multi cluster networking configs have been hydrating, adding a cluster with the env=prod label on the argocd cluster secret will ensure the new cluster sync all the baseline tooling it needs, including ASM Gateways. We have also tagged this first cluster as a wave one cluster. The wave will be leveraged once apps start getting added.
 
 1. **Run the application cluster add script**
 ```bash
 ./scripts/fleet_cluster_add.sh -p ${GKE_PROJECT_ID} -n gke-std-west01 -l us-west1-b -c "172.16.10.0/28" -t "standard" -w one
+```
+
+2. **Browse to the Argocd UI and you will see that the configs in subfolders in the app-clusters-config folder are installing. This state is all driven by the app clusters tooling application set which targets clusters labeled as prod.**
+
+## Creating a new app from the app template
+We have one application cluster ready to serve apps. Now all we need to do is create configs for a new app and push them up to the argocd sync repo and all the prep we have done will simply allow this app to start serving traffic throught the ASM gateway.
+
+1. **Run the team_app_add script**
+```bash
+./scripts/team_app_add.sh -a whereami -i "gcr.io/google-samples/whereami:v1.2.6" -p ${GKE_PROJECT_ID} -t team-2 -h "whereami.endpoints.${GKE_PROJECT_ID}.cloud.goog"
+```
+
+2. **Take a peek at the Argocd UI, filter by the team-2 project for easier location of applications, and you will see that the whereami app is starting to rollout to all application servers labeled was wave-one (there is only one at this point).**
+
+3. **Once the whereami pod have started navigate to it's endpoint and you will see that you are routed to a pod living in the us-west region. You can also curl the endpoint to the same effect.**
+```bash
+curl https://whereami.endpoints.${GKE_PROJECT_ID}.cloud.goog/
+# The output should look something like this...
+{
+  "cluster_name": "gke-std-west02", 
+  "host_header": "whereami.endpoints.argo-spike.cloud.goog", 
+  "pod_name": "whereami-rollout-6d6cb979b5-5xzpj", 
+  "pod_name_emoji": "🇨🇵", 
+  "project_id": "argo-spike", 
+  "timestamp": "2022-08-01T16:16:56", 
+  "zone": "us-west1-b"
+}
+```
+
+## Add another application cluster to the Fleet
+Let's get another application cluster added to the Fleet. This time we will deploy the cluster to us-east and label it as a wave two cluster.
+
+1. **Run the application cluster add script**
+```bash
+./scripts/fleet_cluster_add.sh -p ${GKE_PROJECT_ID} -n gke-std-east01 -l us-east1-b -c "172.16.11.0/28" -t "standard" -w two
+```
+
+2. **Once the whereami pod have started on the us-east cluster, refresh the endpoint webpage or curl it again and you will see that you are routed to a pod living in the region that is closest to you. If you are closer to the west coast and want to see the east coast pod in action you can deploy a GCE instance in the east coast and curl from there or feel free to spin up a curl container in the us-east cluster and curl the endpoint from there.**
+```bash
+curl https://whereami.endpoints.${GKE_PROJECT_ID}.cloud.goog/
+# The output should look something like this...
+{
+  "cluster_name": "gke-std-east01",
+  "host_header": "whereami.endpoints.argo-spike.cloud.goog",
+  "pod_name": "whereami-rollout-6d6cb979b5-x9h4v",
+  "pod_name_emoji": "🧍🏽",
+  "project_id": "argo-spike",
+  "timestamp": "2022-08-01T16:23:42",
+  "zone": "us-east1-b"
+}
+```
+
+## Rolling out new version of an app
+So far we have showed how to add application clusters to the Fleet and new apps to those clusters. We've not showed off the usage of the wave label just yet, so we will do that now. First we need to create a new app that does a better job showing off Argo rollouts. Then we will progressively release the app to wave one followed by wave two clusters with a manual gate inbetween. 
+
+1. **Run the team_app_add script**
+```bash
+./scripts/team_app_add.sh -a rollout-demo -i "argoproj/rollouts-demo:green" -p ${GKE_PROJECT_ID} -t team-1 -h "rollout-demo.endpoints.argo-spike.cloud.goog"
+```
+
+2. **Release a new image of your app to wave one clusters**
+```bash
+./scripts/team_app_rollout.sh -a rollout-demo -t team-1 -i "argoproj/rollouts-demo" -l "yellow" -w "one"
+```
+
+3. **Check the state of your rollout in the argocd UI. You should see a new replicaset and pods being deployed with the new image tag and a progression through the steps of the rollout that generates an analysis templates result after each step. If the analysis does not pass, the rollout will stop and all traffic will be sent to the previous version.**
+
+
+4. **Now that we have progressively release our new image to the first wave of clusters successfully we can move on to releasing the new image to wave two clusters.**
+```bash
+./scripts/team_app_rollout.sh -a rollout-demo -t team-1 -i "argoproj/rollouts-demo" -l "yellow" -w "two"
+```
+
+5. **All of the waves have been rolled out successfully and we need to merge the new image into main to conclude the rollout**
+```bash
+./scripts/team_app_rollout.sh -a rollout-demo -t team-1 -i "argoproj/rollouts-demo" -l "yellow" -w "done"
 ```

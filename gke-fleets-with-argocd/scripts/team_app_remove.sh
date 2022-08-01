@@ -40,7 +40,7 @@ git push
 
 git checkout wave-two 
 git merge main
-git add . && git commit -m "Removed application ${APP_NAME} from wave-one branch."
+git add . && git commit -m "Removed application ${APP_NAME} from wave-two branch."
 git push 
 
 echo "Removed application ${APP_NAME} from all branches."
