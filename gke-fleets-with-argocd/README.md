@@ -1,5 +1,16 @@
 # 🚲 GKE Poc Toolkit Demo: GKE Fleet setup with ArgoCD
 This demo shows you how to bootstrap a Fleet of GKE clusters using ArgoCD as your gitops engine.
+Services in play:
+* [Argocd](https://argo-cd.readthedocs.io/en/stable/)
+* [Argo Rollouts](https://argoproj.github.io/argo-rollouts/)
+* [GKE](https://cloud.google.com/kubernetes-engine/docs)
+* [Multi Cluster Services](https://cloud.google.com/kubernetes-engine/docs/concepts/multi-cluster-services)
+* [Multi Cluster Ingress](https://cloud.google.com/kubernetes-engine/docs/concepts/multi-cluster-ingress)
+* [Anthos Service Mesh w/ Managed Control Plane](https://cloud.google.com/service-mesh/docs/overview#managed_anthos_service_mesh)
+
+
+
+![diagram](assets/diagram.png)
 
 ## Fleet Infra setup
 
