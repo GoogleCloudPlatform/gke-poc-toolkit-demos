@@ -125,82 +125,84 @@ for i in `gcloud container clusters list --project ${PROJECT_ID} --format="value
 done
 rm -rf tmp
 
+# if [[ ${CLUSTER_TYPE} == "autopilot" ]]; then
+#   argocd cluster add ${CLUSTER_NAME} \
+#     --label region=${CLUSTER_LOCATION} \
+#     --label env=prod \
+#     --label wave="${APP_DEPLOYMENT_WAVE}" \
+#     --name ${CLUSTER_NAME} \
+#     --grpc-web \
+#     --system-namespace tools -y
+# else
+#   argocd cluster add ${CLUSTER_NAME} \
+#     --label region=${REGION} \
+#     --label env=prod \
+#     --label wave="${APP_DEPLOYMENT_WAVE}" \
+#     --name ${CLUSTER_NAME} \
+#     --grpc-web \
+#     --system-namespace tools -y
+# fi
+
 if [[ ${CLUSTER_TYPE} == "autopilot" ]]; then
-  argocd cluster add ${CLUSTER_NAME} \
-    --label region=${CLUSTER_LOCATION} \
-    --label env=prod \
-    --label wave="${APP_DEPLOYMENT_WAVE}" \
-    --name ${CLUSTER_NAME} \
-    --grpc-web \
-    --system-namespace tools -y
+cat <<EOF > ${CLUSTER_NAME}-argo-secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ${CLUSTER_NAME}
+  labels:
+    argocd.argoproj.io/secret-type: cluster
+    env: prod
+    region: ${CLUSTER_LOCATION}
+    wave: "${APP_DEPLOYMENT_WAVE}"
+type: Opaque
+stringData:
+  name: ${CLUSTER_NAME}
+  server: https://connectgateway.googleapis.com/v1beta1/projects/${PROJECT_NUMBER}/locations/global/gkeMemberships/${CLUSTER_NAME}
+  config: |
+    {
+      "execProviderConfig": {
+        "command": "argocd-k8s-auth",
+        "args": ["gcp"],
+        "apiVersion": "client.authentication.k8s.io/v1beta1"
+      },
+      "tlsClientConfig": {
+        "insecure": false,
+        "caData": ""
+      }
+    }
+EOF
+kubectl apply -f ${CLUSTER_NAME}-argo-secret.yaml -n argocd --context mccp-central-01
 else
-  argocd cluster add ${CLUSTER_NAME} \
-    --label region=${REGION} \
-    --label env=prod \
-    --label wave="${APP_DEPLOYMENT_WAVE}" \
-    --name ${CLUSTER_NAME} \
-    --grpc-web \
-    --system-namespace tools -y
+cat <<EOF > ${CLUSTER_NAME}-argo-secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ${CLUSTER_NAME}
+  labels:
+    argocd.argoproj.io/secret-type: cluster
+    env: prod
+    region: ${REGION}
+    wave: "${APP_DEPLOYMENT_WAVE}"
+type: Opaque
+stringData:
+  name: ${CLUSTER_NAME}
+  server: https://connectgateway.googleapis.com/v1beta1/projects/${PROJECT_NUMBER}/locations/global/gkeMemberships/${CLUSTER_NAME}
+  config: |
+    {
+      "execProviderConfig": {
+        "command": "argocd-k8s-auth",
+        "args": ["gcp"],
+        "apiVersion": "client.authentication.k8s.io/v1beta1"
+      },
+      "tlsClientConfig": {
+        "insecure": false,
+        "caData": ""
+      }
+    }
+EOF
+kubectl apply -f ${CLUSTER_NAME}-argo-secret.yaml -n argocd --context mccp-central-01
 fi
 
-# if [[ ${CLUSTER_TYPE} == "autopilot" ]]; then
-# cat <<EOF > ${CLUSTER_NAME}-argo-secret.yaml
-# apiVersion: v1
-# kind: Secret
-# metadata:
-#   name: ${CLUSTER_NAME}
-#   labels:
-#     argocd.argoproj.io/secret-type: cluster
-#     env: prod
-#     region: ${CLUSTER_LOCATION}
-#     wave: "${APP_DEPLOYMENT_WAVE}"
-# type: Opaque
-# stringData:
-#   name: ${CLUSTER_NAME}
-#   server: https://connectgateway.googleapis.com/v1beta1/projects/${PROJECT_NUMBER}/locations/global/gkeMemberships/${CLUSTER_NAME}
-#   config: |
-#     {
-#       "execProviderConfig": {
-#         "command": "argocd-k8s-auth",
-#         "args": ["gcp"],
-#         "apiVersion": "client.authentication.k8s.io/v1beta1"
-#       },
-#       "tlsClientConfig": {
-#         "insecure": false,
-#         "caData": ""
-#       }
-#     }
-# EOF
-# kubectl apply -f ${CLUSTER_NAME}-argo-secret.yaml -n argocd --context mccp-central-01
-# else
-# cat <<EOF > ${CLUSTER_NAME}-argo-secret.yaml
-# apiVersion: v1
-# kind: Secret
-# metadata:
-#   name: ${CLUSTER_NAME}
-#   labels:
-#     argocd.argoproj.io/secret-type: cluster
-#     env: prod
-#     region: ${REGION}
-#     wave: "${APP_DEPLOYMENT_WAVE}"
-# type: Opaque
-# stringData:
-#   name: ${CLUSTER_NAME}
-#   server: https://connectgateway.googleapis.com/v1beta1/projects/${PROJECT_NUMBER}/locations/global/gkeMemberships/${CLUSTER_NAME}
-#   config: |
-#     {
-#       "execProviderConfig": {
-#         "command": "argocd-k8s-auth",
-#         "args": ["gcp"],
-#         "apiVersion": "client.authentication.k8s.io/v1beta1"
-#       },
-#       "tlsClientConfig": {
-#         "insecure": false,
-#         "caData": ""
-#       }
-#     }
-# EOF
-# kubectl apply -f ${CLUSTER_NAME}-argo-secret.yaml -n argocd --context mccp-central-01
-# fi
+rm ${CLUSTER_NAME}-argo-secret.yaml
 
 echo "${CLUSTER_NAME} has been deployed and added to the Fleet."

@@ -146,8 +146,15 @@ argocd repo add ${REPO} --username doesnotmatter --password ${PAT_TOKEN} --grpc-
 kubectl apply -f generators/ -n argocd --context mccp-central-01
 
 ### Binding GCP RBAC to the ARGOCD service accounts
-gcloud projects add-iam-policy-binding ${PROJECT_ID} --role "roles/container.admin" --member "serviceAccount:${PROJECT_ID}.svc.id.goog[argocd/argocd-server]"
-gcloud projects add-iam-policy-binding ${PROJECT_ID} --role "roles/container.admin" --member "serviceAccount:${PROJECT_ID}.svc.id.goog[argocd/argocd-application-controller]"
+# gcloud projects add-iam-policy-binding ${PROJECT_ID} --role "roles/container.admin" --member "serviceAccount:${PROJECT_ID}.svc.id.goog[argocd/argocd-server]"
+# gcloud projects add-iam-policy-binding ${PROJECT_ID} --role "roles/container.admin" --member "serviceAccount:${PROJECT_ID}.svc.id.goog[argocd/argocd-application-controller]"
+# gcloud projects add-iam-policy-binding ${PROJECT_ID} --role "roles/gkehub.gatewayAdmin" --member "serviceAccount:${PROJECT_ID}.svc.id.goog[argocd/argocd-server]"
+# gcloud projects add-iam-policy-binding ${PROJECT_ID} --role "roles/gkehub.gatewayAdmin" --member "serviceAccount:${PROJECT_ID}.svc.id.goog[argocd/argocd-application-controller]"
+gcloud iam service-accounts create argocd-fleet-admin --project ${PROJECT_ID}
+gcloud projects add-iam-policy-binding ${PROJECT_ID} --member "serviceAccount:argocd-fleet-admin@${PROJECT_ID}.iam.gserviceaccount.com" --role 'roles/container.admin' --project ${PROJECT_ID}
+gcloud projects add-iam-policy-binding ${PROJECT_ID} --member "serviceAccount:argocd-fleet-admin@${PROJECT_ID}.iam.gserviceaccount.com" --role 'roles/gkehub.gatewayAdmin' --project ${PROJECT_ID}
+gcloud iam service-accounts add-iam-policy-binding --role roles/iam.workloadIdentityUser --member "serviceAccount:${PROJECT_ID}.svc.id.goog[argocd/argocd-server]" argocd-fleet-admin@${PROJECT_ID}.iam.gserviceaccount.com --project ${PROJECT_ID}
+gcloud iam service-accounts add-iam-policy-binding --role roles/iam.workloadIdentityUser --member "serviceAccount:${PROJECT_ID}.svc.id.goog[argocd/argocd-application-controller]" argocd-fleet-admin@${PROJECT_ID}.iam.gserviceaccount.com --project ${PROJECT_ID}
 
 echo "Creating certificates for whereami and rollout demo apps."
 gcloud compute ssl-certificates create whereami-cert \

@@ -10,6 +10,7 @@ resources:
 - argocd-namespace.yaml
 - argocd-managed-cert.yaml
 - argocd-admin-project.yaml
+- argocd-sa.yaml
 
 patchesStrategicMerge:
 - argocd-server-deployment_patch.yaml
