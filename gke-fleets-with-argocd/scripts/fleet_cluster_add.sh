@@ -69,17 +69,17 @@ fi
 function join_by { local IFS="$1"; shift; echo "$*"; }
 ALL_CLUSTER_CIDRS=$(gcloud container clusters list --project ${PROJECT_ID} --format='value(clusterIpv4Cidr)' | sort | uniq)
 ALL_CLUSTER_CIDRS=$(join_by , $(echo "${ALL_CLUSTER_CIDRS}"))
-TAGS=`gcloud compute firewall-rules list --filter="Name:gke-gke*" --format="value(targetTags)" --project ${GKE_PROJECT_ID} | uniq`
+TAGS=`gcloud compute firewall-rules list --filter="Name:gke-gke*" --format="value(targetTags)" --project ${PROJECT_ID} | uniq`
 TAGS=`join_by , $(echo "${TAGS}")`
 echo "Network tags for pod ranges are $TAGS"
 
-if [[ $(gcloud compute firewall-rules describe asm-multicluster-pods) ]]; then
-  gcloud compute firewall-rules update asm-multicluster-pods \
+if [[ $(gcloud compute firewall-rules describe asm-multicluster-pods --project ${PROJECT_ID}) ]]; then
+  gcloud compute firewall-rules update asm-multicluster-pods --project ${PROJECT_ID}\
     --allow=tcp,udp,icmp,esp,ah,sctp \
     --source-ranges="${ALL_CLUSTER_CIDRS}" \
     --target-tags=$TAGS
 else
-  gcloud compute firewall-rules create asm-multicluster-pods \
+  gcloud compute firewall-rules create asm-multicluster-pods --project ${PROJECT_ID}\
     --allow=tcp,udp,icmp,esp,ah,sctp \
     --direction=INGRESS \
     --priority=900 --network=argo-demo \
