@@ -63,7 +63,7 @@ gcloud container clusters delete gke-std-west01 --region us-west1 --project ${GK
 gcloud container clusters delete gke-std-east01 --region us-east1 --project ${GKE_PROJECT_ID} -q --async
 ```
 ## Fleet Cluster setup
-So far we have the infrastructure laid out and now need to setup the multi cluster controller cluster with argocd, GKE Fleet componenents, and some other tooling needed for the demo. 
+So far we have the infrastructure laid out and now need to set up the multi cluster controller cluster with argocd, GKE Fleet components, and some other tooling needed for the demo. 
 
 1. **Clone the demo repo and copy folders the house dry configs for this demo.**
 ```bash
@@ -99,7 +99,7 @@ Now that we have the multi cluster controller cluster setup, we need to create a
 2. **Browse to the Argocd UI and you will see that the configs in subfolders in the app-clusters-config folder are installing. This state is all driven by the app clusters tooling application set which targets clusters labeled as prod.**
 
 ## Creating a new app from the app template
-We have one application cluster ready to serve apps. Now all we need to do is create configs for a new app and push them up to the argocd sync repo and all the prep we have done will simply allow this app to start serving traffic throught the ASM gateway.
+One application cluster is ready to serve apps. Now all we need to do is create configs for a new app and push them up to the Argocd sync repo and all the prep we have done will simply allow this app to start serving traffic through the ASM gateway.
 
 1. **Run the team_app_add script**
 ```bash
@@ -147,7 +147,7 @@ curl https://whereami.endpoints.${GKE_PROJECT_ID}.cloud.goog/
 ```
 
 ## Rolling out new version of an app
-So far we have showed how to add application clusters to the Fleet and new apps to those clusters. We've not showed off the usage of the wave label just yet, so we will do that now. First we need to create a new app that does a better job showing off Argo rollouts. Then we will progressively release the app to wave one followed by wave two clusters with a manual gate inbetween. 
+So far we have added an application cluster to the Fleet and new apps to those clusters. We've not shown off the usage of the wave label just yet, so we will do that now. First we need to create a new app that does a better job showing off Argo rollouts. Then we will progressively release the app to wave one followed by wave two clusters with a manual gate in between. 
 
 1. **Run the team_app_add script**
 ```bash
