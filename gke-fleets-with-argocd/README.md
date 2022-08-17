@@ -18,7 +18,7 @@ Services in play:
 
 2. **Clone the demo repo and copy folders the house dry configs for this demo.**
 ```bash
-git clone git@github.com:GoogleCloudPlatform/gke-poc-toolkit-demos.git  
+git clone https://github.com/GoogleCloudPlatform/gke-poc-toolkit-demos.git  
 cp -rf gke-poc-toolkit-demos/gke-fleets-with-argocd/argo-repo-sync ./
 cp -rf gke-poc-toolkit-demos/gke-fleets-with-argocd/argo-cd-gke ./
 cp -rf gke-poc-toolkit-demos/gke-fleets-with-argocd/scripts ./ 
