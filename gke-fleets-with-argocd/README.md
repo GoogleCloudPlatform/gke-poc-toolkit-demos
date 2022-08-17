@@ -15,7 +15,12 @@ Services in play:
 ## Pre-reqs
 If you don't have these tools already, please install:
 * [ArgoCD CLI](https://argo-cd.readthedocs.io/en/stable/cli_installation/)
-* Install the [Github CLI](https://github.com/cli/cli) and make sure you are authed in.
+* Install the [Github CLI](https://github.com/cli/cli), make sure you are authenticated, and set your git defaults.
+```bash
+gh auth login
+git config --global user.email "you@example.com"
+git config --global user.name "Your Name"
+``` 
 
 ## Fleet Infra setup
 
