@@ -70,7 +70,7 @@ gcloud container clusters delete gke-std-east01 --region us-east1 --project ${GK
 So far we have the infrastructure laid out and now need to set up the multi cluster controller cluster with argocd, GKE Fleet components, and some other tooling needed for the demo. 
 
 1. **Hydrate those configs with our project specific variable by running the Fleet prep script**
-First you need to create a github PAT token. Here is a link that explains how. https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
+First you need to create a github PAT token with repo permissions. Here is a link that explains how. https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
 ```bash
 # Create a var for your PAT token 
 PAT_TOKEN=""
