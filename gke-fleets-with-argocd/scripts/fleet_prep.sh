@@ -126,6 +126,7 @@ while [[ $(kubectl get managedcertificates -n argocd argocd-managed-cert -o=json
   echo "Argocd managed certificate is not yet active and it has been $SECONDS seconds since it was created."
 done
 
+kubectl apply -f argo-cd-gke/argocd-admin-project.yaml -n argocd --context mccp-central-01
 ARGOCD_SECRET=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo)
 echo "Logging into to argocd."
 argocd login "argocd.endpoints.${PROJECT_ID}.cloud.goog" --username admin --password ${ARGOCD_SECRET} --grpc-web
