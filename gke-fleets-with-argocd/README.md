@@ -15,7 +15,7 @@ Services in play:
 ## Pre-reqs
 If you don't have these tools already, please install:
 * [ArgoCD CLI](https://argo-cd.readthedocs.io/en/stable/cli_installation/)
-* [Github CLI](https://github.com/cli/cli)
+* Install the [Github CLI](https://github.com/cli/cli) and make sure you are authed in.
 
 ## Fleet Infra setup
 
