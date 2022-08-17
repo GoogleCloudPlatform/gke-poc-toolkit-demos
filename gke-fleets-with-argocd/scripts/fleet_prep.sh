@@ -140,6 +140,7 @@ find ./ -type f -exec sed -i '' -e "s/{{ASM_GW_IP}}/${ASM_GW_IP}/g" {} +
 find ./ -type f -exec sed -i '' -e "s|{{SYNC_REPO}}|${REPO}|g" {} +
 
 git add . && git commit -m "Initial commit"
+git branch -M main
 git push --set-upstream upstream main
 argocd repo add ${REPO} --username doesnotmatter --password ${PAT_TOKEN} --grpc-web
 
