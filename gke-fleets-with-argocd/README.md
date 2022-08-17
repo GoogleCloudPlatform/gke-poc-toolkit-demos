@@ -16,7 +16,17 @@ Services in play:
 
 1. **Go through the [GKE PoC Toolkit quickstart](https://github.com/GoogleCloudPlatform/gke-poc-toolkit#quickstart) up until the `gkekitctl create` and stop at step 6 (gkekitctl init).** 
 
-2. **Export vars and add them to your GKE POC toolkit config.yaml.**
+2. **Clone the demo repo and copy folders the house dry configs for this demo.**
+```bash
+git clone git@github.com:GoogleCloudPlatform/gke-poc-toolkit-demos.git  
+cp -rf gke-poc-toolkit-demos/gke-fleets-with-argocd/argo-repo-sync ./
+cp -rf gke-poc-toolkit-demos/gke-fleets-with-argocd/argo-cd-gke ./
+cp -rf gke-poc-toolkit-demos/gke-fleets-with-argocd/scripts ./ 
+cp -rf gke-poc-toolkit-demos/gke-fleets-with-argocd/config.yaml ./
+rm -rf gke-poc-toolkit-demos
+```
+
+3. **Export vars and add them to your GKE POC toolkit config.yaml.**
 ``` bash 
 export GKE_PROJECT_ID=<your-gke-clusters-project-id>
 if [[ "$OSTYPE" == "darwin"* ]]; then
@@ -30,15 +40,15 @@ else
 fi
 ```
 
-3. **Run `./gkekitctl create --config config.yaml` from this directory.** This will take about 15 minutes to run.
+4. **Run `./gkekitctl create --config config.yaml` from this directory.** This will take about 15 minutes to run.
 
-4. **Connect to your newly-created GKE clusters**
+5. **Connect to your newly-created GKE clusters**
 
 ```bash
 gcloud container clusters get-credentials mccp-central-01 --region us-central1 --project ${GKE_PROJECT_ID}
 ```
 
-5. **We highly recommend installing [kubectx and kubens](https://github.com/ahmetb/kubectx) to switch kubectl contexts between clusters with ease. Once done, you can validate you clusters like so.**
+6. **We highly recommend installing [kubectx and kubens](https://github.com/ahmetb/kubectx) to switch kubectl contexts between clusters with ease. Once done, you can validate you clusters like so.**
 ```bash
 kubectx mccp-central-01=gke_${GKE_PROJECT_ID}_us-central1_mccp-central-01
 kubectl get nodes
@@ -51,7 +61,7 @@ gke-mccp-central-01-linux-gke-toolkit-poo-12b0fa78-grhw   Ready    <none>   11m 
 gke-mccp-central-01-linux-gke-toolkit-poo-24d712a2-jm5g   Ready    <none>   11m   v1.21.6-gke.1500
 gke-mccp-central-01-linux-gke-toolkit-poo-6fb11d07-h6xb   Ready    <none>   11m   v1.21.6-gke.1500
 ```
-6. **Now we are going to delete the app clusters you created for a better demo flow.**
+7. **Now we are going to delete the app clusters you created for a better demo flow.**
 ```bash
 gcloud container clusters delete gke-std-west01 --region us-west1 --project ${GKE_PROJECT_ID} -q --async
 gcloud container clusters delete gke-std-east01 --region us-east1 --project ${GKE_PROJECT_ID} -q --async
@@ -59,16 +69,7 @@ gcloud container clusters delete gke-std-east01 --region us-east1 --project ${GK
 ## Fleet Cluster setup
 So far we have the infrastructure laid out and now need to set up the multi cluster controller cluster with argocd, GKE Fleet components, and some other tooling needed for the demo. 
 
-1. **Clone the demo repo and copy folders the house dry configs for this demo.**
-```bash
-git clone git@github.com:GoogleCloudPlatform/gke-poc-toolkit-demos.git  
-cp -rf gke-poc-toolkit-demos/gke-fleets-with-argocd/argo-repo-sync ./
-cp -rf gke-poc-toolkit-demos/gke-fleets-with-argocd/argo-cd-gke ./
-cp -rf gke-poc-toolkit-demos/gke-fleets-with-argocd/scripts ./ 
-rm -rf gke-poc-toolkit-demos
-```
-
-2. **Hydrate those configs with our project specific variable by running the Fleet prep script**
+1. **Hydrate those configs with our project specific variable by running the Fleet prep script**
 First you need to create a github PAT token. Here is a link that explains how. https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
 ```bash
 # Create a var for your PAT token 
