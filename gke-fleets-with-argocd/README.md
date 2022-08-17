@@ -12,22 +12,43 @@ Services in play:
 
 ![diagram](assets/diagram.png)
 
+## Pre-reqs
+If you don't have these tools already, please install:
+* [ArgoCD CLI](https://argo-cd.readthedocs.io/en/stable/cli_installation/)
+* [Github CLI](https://github.com/cli/cli)
+
 ## Fleet Infra setup
 
-1. **Go through the [GKE PoC Toolkit quickstart](https://github.com/GoogleCloudPlatform/gke-poc-toolkit#quickstart) up until the `gkekitctl create` and stop at step 6 (gkekitctl init).** 
+1. **Initiliaze the GKE POC Toolkit (gkekitctl init).** 
+```bash
+export GKE_PROJECT_ID=<your-project-id>
+export OS="darwin" # choice of darwin or amd64 
+gcloud config set project $GKE_PROJECT_ID
+gcloud auth login
+gcloud auth application-default login
+
+ROOT_DIR=`pwd`
+mkdir gke-poc-toolkit && cd "$_"
+VERSION=$(curl -s https://api.github.com/repos/GoogleCloudPlatform/gke-poc-toolkit/releases/latest | grep browser_download_url | cut -d "/" -f 8 | tail -1)
+curl -sLSf -o ./gkekitctl https://github.com/GoogleCloudPlatform/gke-poc-toolkit/releases/download/${VERSION}/gkekitctl-${OS} && chmod +x ./gkekitctl
+
+./gkekitctl init
+```
 
 2. **Clone the demo repo and copy folders the house dry configs for this demo.**
 ```bash
+cd ${ROOT_DIR}
 git clone https://github.com/GoogleCloudPlatform/gke-poc-toolkit-demos.git  
 cp -rf gke-poc-toolkit-demos/gke-fleets-with-argocd/argo-repo-sync ./
 cp -rf gke-poc-toolkit-demos/gke-fleets-with-argocd/argo-cd-gke ./
 cp -rf gke-poc-toolkit-demos/gke-fleets-with-argocd/scripts ./ 
-cp -rf gke-poc-toolkit-demos/gke-fleets-with-argocd/config.yaml ./
+cp -rf gke-poc-toolkit-demos/gke-fleets-with-argocd/config.yaml ./gke-poc-toolkit/config.yaml
 rm -rf gke-poc-toolkit-demos
 ```
 
 3. **Export vars and add them to your GKE POC toolkit config.yaml.**
-``` bash 
+``` bash
+cd ${ROOT_DIR}/gke-poc-toolkit 
 export GKE_PROJECT_ID=<your-gke-clusters-project-id>
 if [[ "$OSTYPE" == "darwin"* ]]; then
   sed -i '' -e "s/clustersProjectId: \"my-project\"/clustersProjectId: \"${GKE_PROJECT_ID}\"/g" config.yaml
@@ -72,6 +93,7 @@ So far we have the infrastructure laid out and now need to set up the multi clus
 1. **Hydrate those configs with our project specific variable by running the Fleet prep script**
 First you need to create a github PAT token with repo permissions. Here is a link that explains how. https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
 ```bash
+cd ${ROOT_DIR}
 # Create a var for your PAT token 
 PAT_TOKEN=""
 # Name for the private github repo that will be created
