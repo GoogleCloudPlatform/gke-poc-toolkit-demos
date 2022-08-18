@@ -164,17 +164,31 @@ cd argo-repo-sync
 git init
 gh repo create ${SYNC_REPO} --private --source=. --remote=upstream
 REPO="https://github.com/"$(gh repo list | grep ${SYNC_REPO} | awk '{print $1}')
-find ./ -type f -exec sed -i '' -e "s/{{GKE_PROJECT_ID}}/${PROJECT_ID}/g" {} +
-find ./ -type f -exec sed -i '' -e "s/{{ASM_GW_IP}}/${ASM_GW_IP}/g" {} +
-find ./ -type f -exec sed -i '' -e "s|{{SYNC_REPO}}|${REPO}|g" {} +
 
-git branch -M main
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    find ./ -type f -exec sed -i '' -e "s/{{GKE_PROJECT_ID}}/${PROJECT_ID}/g" {} +
+    find ./ -type f -exec sed -i '' -e "s/{{ASM_GW_IP}}/${ASM_GW_IP}/g" {} +
+    find ./ -type f -exec sed -i '' -e "s|{{SYNC_REPO}}|${REPO}|g" {} +
+else
+    find ./ -type f -exec sed -i -e "s/{{GKE_PROJECT_ID}}/${PROJECT_ID}/g" {} +
+    find ./ -type f -exec sed -i -e "s/{{ASM_GW_IP}}/${ASM_GW_IP}/g" {} +
+    find ./ -type f -exec sed -i -e "s|{{SYNC_REPO}}|${REPO}|g" {} +
+fi
+
 git checkout -b wave-one
+git merge main
+git add . && git commit -m "Setup wave-one branch."
 git push -u upstream wave-one 
-git checkout -b wave-two
-git push -u upstream wave-two 
+
+git checkout wave-two
+git merge wave-one
+git add . && git commit -m "Setup wave-two branch."
+git push -u upstream wave-two
+
 git checkout main
+git merge wave-two
 git add . && git commit -m "Initial commit"
+git push --set-upstream upstream main
 
 git push --set-upstream upstream main
 argocd repo add ${REPO} --username doesnotmatter --password ${PAT_TOKEN} --grpc-web
