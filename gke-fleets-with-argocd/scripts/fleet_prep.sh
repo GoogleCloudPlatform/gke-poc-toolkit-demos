@@ -72,6 +72,23 @@ spec:
                 number: 80
 EOF
 
+cat <<EOF > ${script_dir}/../argo-cd-gke/argocd-sa.yaml
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    iam.gke.io/gcp-service-account: argocd-fleet-admin@$PROJECT_ID.iam.gserviceaccount.com
+  name: argocd-application-controller
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    iam.gke.io/gcp-service-account: argocd-fleet-admin@$PROJECT_ID.iam.gserviceaccount.com
+  name: argocd-server
+EOF
+
 kubectl apply -k argo-cd-gke
 SECONDS=0
 echo "Creating a global public IP for the ASM GW."
@@ -118,7 +135,27 @@ while [[ $(kubectl get managedcertificates -n argocd argocd-managed-cert -o=json
   echo "Argocd managed certificate is not yet active and it has been $SECONDS seconds since it was created."
 done
 
+cat <<EOF > argo-cd-gke/argocd-admin-project.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: admin
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  sourceRepos:
+  - '*'
+  destinations:
+  - namespace: '*'
+    server: '*'
+  clusterResourceWhitelist:
+  - group: '*'
+    kind: '*'
+EOF
+
 kubectl apply -f argo-cd-gke/argocd-admin-project.yaml -n argocd --context mccp-central-01
+
 ARGOCD_SECRET=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo)
 echo "Logging into to argocd."
 argocd login "argocd.endpoints.${PROJECT_ID}.cloud.goog" --username admin --password ${ARGOCD_SECRET} --grpc-web
