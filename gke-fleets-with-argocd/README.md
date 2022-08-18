@@ -40,7 +40,7 @@ curl -sLSf -o ./gkekitctl https://github.com/GoogleCloudPlatform/gke-poc-toolkit
 ./gkekitctl init
 ```
 
-2. **Clone the demo repo and copy folders the house dry configs for this demo.**
+2. **Clone the demo repo and copy folders that house dry configs for this demo.**
 ```bash
 cd ${ROOT_DIR}
 git clone https://github.com/GoogleCloudPlatform/gke-poc-toolkit-demos.git  
