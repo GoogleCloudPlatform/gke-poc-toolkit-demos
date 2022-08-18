@@ -29,7 +29,7 @@ spec:
           defaultMode: 420
           sources:
           - serviceAccountToken:
-              audience: xuebinz-gke.svc.id.goog
+              audience: ${PROJECT_ID}.svc.id.goog
               expirationSeconds: 172800
               path: token
           - configMap:
@@ -70,7 +70,7 @@ spec:
           defaultMode: 420
           sources:
           - serviceAccountToken:
-              audience: xuebinz-gke.svc.id.goog
+              audience: ${PROJECT_ID}.svc.id.goog
               expirationSeconds: 172800
               path: token
           - configMap:
