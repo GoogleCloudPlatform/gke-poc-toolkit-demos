@@ -105,6 +105,8 @@ REPO=""
 ./scripts/fleet_prep.sh -p ${GKE_PROJECT_ID} -r ${REPO} -t ${PAT_TOKEN}
 # Get your temp argocd admin password
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
+# Login to Argocd
+argocd login "argocd.endpoints.${GKE_PROJECT_ID}.cloud.goog" --username admin
 # Update your argocd admin password.
 argocd account update-password --grpc-web
 ```
