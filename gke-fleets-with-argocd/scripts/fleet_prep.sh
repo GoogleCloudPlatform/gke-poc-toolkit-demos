@@ -175,6 +175,7 @@ else
     find ./ -type f -exec sed -i -e "s|{{SYNC_REPO}}|${REPO}|g" {} +
 fi
 
+git branch -M main
 git add . && git commit -m "Initial commit"
 git remote add origin ${REPO}
 git push -u origin main
