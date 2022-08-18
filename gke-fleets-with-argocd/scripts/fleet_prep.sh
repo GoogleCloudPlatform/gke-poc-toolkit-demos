@@ -175,6 +175,7 @@ else
     find ./ -type f -exec sed -i -e "s|{{SYNC_REPO}}|${REPO}|g" {} +
 fi
 
+git branch -M main
 git checkout -b wave-one
 git merge main
 git add . && git commit -m "Setup wave-one branch."
