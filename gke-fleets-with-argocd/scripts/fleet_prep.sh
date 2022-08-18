@@ -37,7 +37,7 @@ x-google-endpoints:
 EOF
 gcloud endpoints services deploy argocd-openapi.yaml --project ${PROJECT_ID}
 
-cat <<EOF > ${script_dir}/../argo-cd-gke/argocd-managed-cert.yaml
+cat <<EOF > ${script_dir}/../argo-cd-gke/overlays/gke_ingress/argocd-managed-cert.yaml
 apiVersion: networking.gke.io/v1
 kind: ManagedCertificate
 metadata:
@@ -48,7 +48,7 @@ spec:
   - "argocd.endpoints.${PROJECT_ID}.cloud.goog"
 EOF
 
-cat <<EOF > ${script_dir}/../argo-cd-gke/argocd-server-ingress.yaml
+cat <<EOF > ${script_dir}/../argo-cd-gke/overlays/gke_ingress/argocd-server-ingress.yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -72,7 +72,7 @@ spec:
                 number: 80
 EOF
 
-cat <<EOF > ${script_dir}/../argo-cd-gke/argocd-sa.yaml
+cat <<EOF > ${script_dir}/../argo-cd-gke/overlays/gke_ingress/argocd-sa.yaml
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -89,7 +89,7 @@ metadata:
   name: argocd-server
 EOF
 
-kubectl apply -k argo-cd-gke
+kubectl apply -k argo-cd-gke/overlays/gke_ingress
 SECONDS=0
 echo "Creating a global public IP for the ASM GW."
 gcloud compute addresses create asm-gw-ip --global --project ${PROJECT_ID}
@@ -135,7 +135,7 @@ while [[ $(kubectl get managedcertificates -n argocd argocd-managed-cert -o=json
   echo "Argocd managed certificate is not yet active and it has been $SECONDS seconds since it was created."
 done
 
-cat <<EOF > argo-cd-gke/argocd-admin-project.yaml
+cat <<EOF > argo-cd-gke/overlays/gke_ingress/argocd-admin-project.yaml
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
@@ -154,7 +154,7 @@ spec:
     kind: '*'
 EOF
 
-kubectl apply -f argo-cd-gke/argocd-admin-project.yaml -n argocd --context mccp-central-01
+kubectl apply -f argo-cd-gke/overlays/gke_ingress/argocd-admin-project.yaml -n argocd --context mccp-central-01
 
 ARGOCD_SECRET=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo)
 echo "Logging into to argocd."

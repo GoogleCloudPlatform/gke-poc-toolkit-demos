@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: argocd-application-controller
+  namespace: argocd
+spec:
+  template:
+    spec:
+      containers:
+      - command:
+        - argocd-application-controller
+        - --status-processors
+        - "20"
+        - --operation-processors
+        - "10"
+        - --redis
+        - argocd-redis-ha-haproxy:6379
+        env:
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /var/run/secrets/tokens/gcp-ksa/google-application-credentials.json
+        name: argocd-application-controller
+        volumeMounts:
+        - mountPath: /var/run/secrets/tokens/gcp-ksa
+          name: gcp-ksa
+          readOnly: true
+      volumes:
+      - name: gcp-ksa
+        projected:
+          defaultMode: 420
+          sources:
+          - serviceAccountToken:
+              audience: xuebinz-gke.svc.id.goog
+              expirationSeconds: 172800
+              path: token
+          - configMap:
+              items:
+              - key: config
+                path: google-application-credentials.json
+              name: my-cloudsdk-config
+              optional: false
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: argocd-server
+  namespace: argocd
+spec:
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app.kubernetes.io/name: argocd-server
+    spec:
+      containers:
+      - command:
+        - argocd-server
+        - --redis
+        - argocd-redis-ha-haproxy:6379
+        env:
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /var/run/secrets/tokens/gcp-ksa/google-application-credentials.json
+        name: argocd-server
+        volumeMounts:
+        - mountPath: /var/run/secrets/tokens/gcp-ksa
+          name: gcp-ksa
+          readOnly: true
+      volumes:
+      - name: gcp-ksa
+        projected:
+          defaultMode: 420
+          sources:
+          - serviceAccountToken:
+              audience: xuebinz-gke.svc.id.goog
+              expirationSeconds: 172800
+              path: token
+          - configMap:
+              items:
+              - key: config
+                path: google-application-credentials.json
+              name: my-cloudsdk-config
+              optional: false
