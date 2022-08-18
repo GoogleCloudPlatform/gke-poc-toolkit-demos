@@ -175,21 +175,21 @@ else
     find ./ -type f -exec sed -i -e "s|{{SYNC_REPO}}|${REPO}|g" {} +
 fi
 
+git add . && git commit -m "Initial commit"
 git branch -M main
+git remote add origin ${REPO}
+git push -u origin main
+
 git checkout -b wave-one
 git merge main
 git add . && git commit -m "Setup wave-one branch."
-git push -u upstream wave-one 
+git push -u main wave-one 
 
-git checkout wave-two
+git checkout -b wave-two
 git merge wave-one
 git add . && git commit -m "Setup wave-two branch."
-git push -u upstream wave-two
-
+git push -u main wave-two
 git checkout main
-git merge wave-two
-git add . && git commit -m "Initial commit"
-git push --set-upstream upstream main
 
 argocd repo add ${REPO} --username doesnotmatter --password ${PAT_TOKEN} --grpc-web
 
