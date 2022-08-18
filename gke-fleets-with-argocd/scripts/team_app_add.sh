@@ -28,15 +28,27 @@ mkdir -p ${APP_DIR}
 cp ../argo-repo-sync/app-template/new-app/* ${APP_DIR}
 
 APP_IMAGE="${APP_IMAGE}"
-for file in ${APP_DIR}*; do
-    [ -e "${file}" ]
-    echo ${file}
-    sed -i '' -e "s/APP_NAME/${APP_NAME}/g" ${file}
-    sed -i '' -e "s|APP_IMAGE|${APP_IMAGE}|g" ${file}
-    sed -i '' -e "s/TEAM_NAME/${TEAM_NAME}/g" ${file}
-    # sed -i '' -e "s/WAVE/${WAVE}/g" ${file}
-    sed -i '' -e "s/APP_HOST_NAME/${APP_HOST_NAME}/g" ${file}
-done
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    for file in ${APP_DIR}*; do
+        [ -e "${file}" ]
+        echo ${file}
+        sed -i '' -e "s/APP_NAME/${APP_NAME}/g" ${file}
+        sed -i '' -e "s|APP_IMAGE|${APP_IMAGE}|g" ${file}
+        sed -i '' -e "s/TEAM_NAME/${TEAM_NAME}/g" ${file}
+        # sed -i '' -e "s/WAVE/${WAVE}/g" ${file}
+        sed -i '' -e "s/APP_HOST_NAME/${APP_HOST_NAME}/g" ${file}
+    done
+else
+    for file in ${APP_DIR}*; do
+        [ -e "${file}" ]
+        echo ${file}
+        sed -i -e "s/APP_NAME/${APP_NAME}/g" ${file}
+        sed -i -e "s|APP_IMAGE|${APP_IMAGE}|g" ${file}
+        sed -i -e "s/TEAM_NAME/${TEAM_NAME}/g" ${file}
+        # sed -i '' -e "s/WAVE/${WAVE}/g" ${file}
+        sed -i -e "s/APP_HOST_NAME/${APP_HOST_NAME}/g" ${file}
+    done
+fi
 
 mv ${APP_DIR}applicationset-wave-1.yaml ../argo-repo-sync/generators/${TEAM_NAME}-${APP_NAME}-applicationset-wave-1.yaml
 mv ${APP_DIR}applicationset-wave-2.yaml ../argo-repo-sync/generators/${TEAM_NAME}-${APP_NAME}-applicationset-wave-2.yaml

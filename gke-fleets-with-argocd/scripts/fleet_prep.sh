@@ -17,14 +17,6 @@ echo "::Variable set::"
 echo "PROJECT_ID: ${PROJECT_ID}"
 echo "SYNC_REPO: ${SYNC_REPO}"
 
-### Download config repo ###
-# git clone git@github.com:GoogleCloudPlatform/gke-poc-toolkit-demos.git  
-# cp -rf gke-poc-toolkit-demos/gke-fleets-with-argocd/argo-repo-sync ./
-# cp -rf gke-poc-toolkit-demos/gke-fleets-with-argocd/argo-cd-gke ./
-# cp -rf gke-poc-toolkit-demos/gke-fleets-with-argocd/scripts ./ 
-# rm -rf gke-poc-toolkit-demos
-
-
 ### ArgoCD Install###
 echo "Setting up ArgoCD on the mccp cluster including configure it for GKE Ingress."
 gcloud compute addresses create argocd-ip --global --project ${PROJECT_ID}
@@ -80,6 +72,23 @@ spec:
                 number: 80
 EOF
 
+cat <<EOF > argo-cd-gke/argocd-sa.yaml
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    iam.gke.io/gcp-service-account: argocd-fleet-admin@${PROJECT_ID}.iam.gserviceaccount.com
+  name: argocd-application-controller
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    iam.gke.io/gcp-service-account: argocd-fleet-admin@${PROJECT_ID}.iam.gserviceaccount.com
+  name: argocd-server
+EOF
+
 kubectl apply -k argo-cd-gke
 SECONDS=0
 echo "Creating a global public IP for the ASM GW."
@@ -126,7 +135,27 @@ while [[ $(kubectl get managedcertificates -n argocd argocd-managed-cert -o=json
   echo "Argocd managed certificate is not yet active and it has been $SECONDS seconds since it was created."
 done
 
+cat <<EOF > argo-cd-gke/argocd-admin-project.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: admin
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  sourceRepos:
+  - '*'
+  destinations:
+  - namespace: '*'
+    server: '*'
+  clusterResourceWhitelist:
+  - group: '*'
+    kind: '*'
+EOF
+
 kubectl apply -f argo-cd-gke/argocd-admin-project.yaml -n argocd --context mccp-central-01
+
 ARGOCD_SECRET=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo)
 echo "Logging into to argocd."
 argocd login "argocd.endpoints.${PROJECT_ID}.cloud.goog" --username admin --password ${ARGOCD_SECRET} --grpc-web
@@ -139,9 +168,14 @@ find ./ -type f -exec sed -i '' -e "s/{{GKE_PROJECT_ID}}/${PROJECT_ID}/g" {} +
 find ./ -type f -exec sed -i '' -e "s/{{ASM_GW_IP}}/${ASM_GW_IP}/g" {} +
 find ./ -type f -exec sed -i '' -e "s|{{SYNC_REPO}}|${REPO}|g" {} +
 
-git add . && git commit -m "Initial commit"
 git branch -M main
-git push --set-upstream upstream main
+git checkout -b wave-one
+git push -u upstream wave-one 
+git checkout -b wave-two
+git push -u upstream wave-two 
+git checkout main
+git add . && git commit -m "Initial commit"
+
 argocd repo add ${REPO} --username doesnotmatter --password ${PAT_TOKEN} --grpc-web
 
 ### Setup applicationsets ###

@@ -24,22 +24,42 @@ echo "WAVE:${WAVE}"
 
 cd $script_dir/../argo-repo-sync
 APP_DIR=../argo-repo-sync/teams/${TEAM_NAME}/${APP_NAME}/
-if [[ ${WAVE} == "one" ]]; then
-    git checkout wave-one
-    git merge main
-    sed -i '' -e "s|image: ${APP_IMAGE}:.*|image: ${APP_IMAGE}:${APP_IMAGE_TAG}|g" ${APP_DIR}rollout.yaml
-    git add . && git commit -m "Updated application ${APP_NAME} image tag to ${APP_IMAGE}:${APP_IMAGE_TAG} on wave ${WAVE} clusters."
-    git push 
-elif [[ ${WAVE} == "two" ]]; then
-    git checkout wave-two
-    git merge wave-one
-    git add . && git commit -m "Updated application ${APP_NAME} image tag to ${APP_IMAGE}:${APP_IMAGE_TAG} on wave ${WAVE} clusters."
-    git push 
-else
-    git checkout main
-    git merge wave-two
-    git add . && git commit -m "Merged application ${APP_NAME} update ${APP_IMAGE}:${APP_IMAGE_TAG} into main."
-    git push
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    if [[ ${WAVE} == "one" ]]; then
+        git checkout wave-one
+        git merge main
+        sed -i '' -e "s|image: ${APP_IMAGE}:.*|image: ${APP_IMAGE}:${APP_IMAGE_TAG}|g" ${APP_DIR}rollout.yaml
+        git add . && git commit -m "Updated application ${APP_NAME} image tag to ${APP_IMAGE}:${APP_IMAGE_TAG} on wave ${WAVE} clusters."
+        git push 
+    elif [[ ${WAVE} == "two" ]]; then
+        git checkout wave-two
+        git merge wave-one
+        git add . && git commit -m "Updated application ${APP_NAME} image tag to ${APP_IMAGE}:${APP_IMAGE_TAG} on wave ${WAVE} clusters."
+        git push 
+    else
+        git checkout main
+        git merge wave-two
+        git add . && git commit -m "Merged application ${APP_NAME} update ${APP_IMAGE}:${APP_IMAGE_TAG} into main."
+        git push
+    fi
+else 
+    if [[ ${WAVE} == "one" ]]; then
+        git checkout wave-one
+        git merge main
+        sed -i -e "s|image: ${APP_IMAGE}:.*|image: ${APP_IMAGE}:${APP_IMAGE_TAG}|g" ${APP_DIR}rollout.yaml
+        git add . && git commit -m "Updated application ${APP_NAME} image tag to ${APP_IMAGE}:${APP_IMAGE_TAG} on wave ${WAVE} clusters."
+        git push 
+    elif [[ ${WAVE} == "two" ]]; then
+        git checkout wave-two
+        git merge wave-one
+        git add . && git commit -m "Updated application ${APP_NAME} image tag to ${APP_IMAGE}:${APP_IMAGE_TAG} on wave ${WAVE} clusters."
+        git push 
+    else
+        git checkout main
+        git merge wave-two
+        git add . && git commit -m "Merged application ${APP_NAME} update ${APP_IMAGE}:${APP_IMAGE_TAG} into main."
+        git push
+    fi
 fi
 
 
