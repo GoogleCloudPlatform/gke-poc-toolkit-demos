@@ -78,14 +78,14 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   annotations:
-    iam.gke.io/gcp-service-account: argocd-fleet-admin@$PROJECT_ID.iam.gserviceaccount.com
+    iam.gke.io/gcp-service-account: argocd-fleet-admin@${PROJECT_ID}.iam.gserviceaccount.com
   name: argocd-application-controller
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   annotations:
-    iam.gke.io/gcp-service-account: argocd-fleet-admin@$PROJECT_ID.iam.gserviceaccount.com
+    iam.gke.io/gcp-service-account: argocd-fleet-admin@${PROJECT_ID}.iam.gserviceaccount.com
   name: argocd-server
 EOF
 
