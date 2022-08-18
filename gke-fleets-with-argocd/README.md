@@ -54,7 +54,6 @@ rm -rf gke-poc-toolkit-demos
 3. **Export vars and add them to your GKE POC toolkit config.yaml.**
 ``` bash
 cd ${ROOT_DIR}/gke-poc-toolkit 
-export GKE_PROJECT_ID=<your-gke-clusters-project-id>
 if [[ "$OSTYPE" == "darwin"* ]]; then
   sed -i '' -e "s/clustersProjectId: \"my-project\"/clustersProjectId: \"${GKE_PROJECT_ID}\"/g" config.yaml
   sed -i '' -e "s/governanceProjectId: \"my-project\"/governanceProjectId: \"${GKE_PROJECT_ID}\"/g" config.yaml
