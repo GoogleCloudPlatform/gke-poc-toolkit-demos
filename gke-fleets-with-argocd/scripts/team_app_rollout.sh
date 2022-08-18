@@ -30,17 +30,17 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
         git merge main
         sed -i '' -e "s|image: ${APP_IMAGE}:.*|image: ${APP_IMAGE}:${APP_IMAGE_TAG}|g" ${APP_DIR}rollout.yaml
         git add . && git commit -m "Updated application ${APP_NAME} image tag to ${APP_IMAGE}:${APP_IMAGE_TAG} on wave ${WAVE} clusters."
-        git push 
+        git push -u origin wave-one
     elif [[ ${WAVE} == "two" ]]; then
         git checkout wave-two
         git merge wave-one
         git add . && git commit -m "Updated application ${APP_NAME} image tag to ${APP_IMAGE}:${APP_IMAGE_TAG} on wave ${WAVE} clusters."
-        git push 
+        git push -u origin wave-two
     else
         git checkout main
         git merge wave-two
         git add . && git commit -m "Merged application ${APP_NAME} update ${APP_IMAGE}:${APP_IMAGE_TAG} into main."
-        git push
+        git push -u origin main
     fi
 else 
     if [[ ${WAVE} == "one" ]]; then
@@ -48,17 +48,17 @@ else
         git merge main
         sed -i -e "s|image: ${APP_IMAGE}:.*|image: ${APP_IMAGE}:${APP_IMAGE_TAG}|g" ${APP_DIR}rollout.yaml
         git add . && git commit -m "Updated application ${APP_NAME} image tag to ${APP_IMAGE}:${APP_IMAGE_TAG} on wave ${WAVE} clusters."
-        git push 
+        git push -u origin wave-one
     elif [[ ${WAVE} == "two" ]]; then
         git checkout wave-two
         git merge wave-one
         git add . && git commit -m "Updated application ${APP_NAME} image tag to ${APP_IMAGE}:${APP_IMAGE_TAG} on wave ${WAVE} clusters."
-        git push 
+        git push -u origin wave-two
     else
         git checkout main
         git merge wave-two
         git add . && git commit -m "Merged application ${APP_NAME} update ${APP_IMAGE}:${APP_IMAGE_TAG} into main."
-        git push
+        git push -u origin main
     fi
 fi
 

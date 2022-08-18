@@ -63,17 +63,17 @@ cd ../argo-repo-sync
 git checkout wave-one
 git merge main
 git add . && git commit -m "Added application ${APP_NAME} to wave-one branch."
-git push -u upstream wave-one 
+git push -u origin wave-one 
 
 git checkout wave-two
 git merge wave-one
 git add . && git commit -m "Added application ${APP_NAME} to wave-two branch."
-git push -u upstream wave-two
+git push -u origin wave-two
 
 git checkout main
 git merge wave-two
 git add . && git commit -m "Added application ${APP_NAME} to team ${TEAM_NAME}."
-git push --set-upstream upstream main  
+git push -u origin main   
 
 kubectl apply -f ../argo-repo-sync/teams/${TEAM_NAME}/argocd-project.yaml -n argocd --context mccp-central-01
 kubectl apply -f ../argo-repo-sync/generators/${TEAM_NAME}-${APP_NAME}-applicationset-wave-1.yaml -n argocd --context mccp-central-01

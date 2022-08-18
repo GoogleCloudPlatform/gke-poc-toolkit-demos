@@ -176,19 +176,18 @@ else
 fi
 
 git add . && git commit -m "Initial commit"
-git branch -M main
 git remote add origin ${REPO}
 git push -u origin main
 
 git checkout -b wave-one
 git merge main
 git add . && git commit -m "Setup wave-one branch."
-git push -u main wave-one 
+git push -u origin wave-one 
 
 git checkout -b wave-two
 git merge wave-one
 git add . && git commit -m "Setup wave-two branch."
-git push -u main wave-two
+git push -u origin wave-two
 git checkout main
 
 argocd repo add ${REPO} --username doesnotmatter --password ${PAT_TOKEN} --grpc-web
