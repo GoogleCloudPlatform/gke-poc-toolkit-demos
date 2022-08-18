@@ -190,7 +190,6 @@ git merge wave-two
 git add . && git commit -m "Initial commit"
 git push --set-upstream upstream main
 
-git push --set-upstream upstream main
 argocd repo add ${REPO} --username doesnotmatter --password ${PAT_TOKEN} --grpc-web
 
 ### Setup applicationsets ###
