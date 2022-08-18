@@ -1,0 +1,17 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  namespace: argocd
+  name: my-cloudsdk-config
+data:
+  config: |
+    {
+      "type": "external_account",
+      "audience": "identitynamespace:xuebinz-gke.svc.id.goog:https://gkehub.googleapis.com/projects/${PROJECT_ID}/locations/global/memberships/${FLEET_MEMBERSHIP_NAME}",
+      "service_account_impersonation_url": "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/argo-wi-sa@${PROJECT_ID}.iam.gserviceaccount.com:generateAccessToken",
+      "subject_token_type": "urn:ietf:params:oauth:token-type:jwt",
+      "token_url": "https://sts.googleapis.com/v1/token",
+      "credential_source": {
+        "file": "/var/run/secrets/tokens/gcp-ksa/token"
+      }
+    }
