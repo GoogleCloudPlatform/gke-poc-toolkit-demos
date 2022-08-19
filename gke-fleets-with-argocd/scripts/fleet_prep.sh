@@ -225,8 +225,6 @@ else
   argocd repo add ${REPO} --username doesnotmatter --password ${PAT_TOKEN} --grpc-web
 fi
 
-gcloud container fleet ingress disable -q
-gcloud container fleet ingress enable --config-membership mccp-central-01-membership -q
 
 ### Setup applicationsets ###
 kubectl apply -f generators/ -n argocd --context mccp-central-01
