@@ -207,6 +207,8 @@ rm ${CLUSTER_NAME}-argo-secret.yaml
 
 ## Check for apps managed certs and create them if they do not exist
 if [[ $(gcloud compute ssl-certificates describe whereami-cert --project ${PROJECT_ID}) ]]; then
+  echo "Whereami demo app cert already exists"
+else
   echo "Creating certificates for whereami demo app."
   gcloud compute ssl-certificates create whereami-cert \
       --domains=whereami.endpoints.${PROJECT_ID}.cloud.goog \
@@ -214,6 +216,8 @@ if [[ $(gcloud compute ssl-certificates describe whereami-cert --project ${PROJE
 fi
 
 if [[ $(gcloud compute ssl-certificates describe rollout-demo-cert --project ${PROJECT_ID}) ]]; then
+  echo "Rollout demo app cert already exists"
+else
   echo "Creating certificate for rollout demo app."
   gcloud compute ssl-certificates create rollout-demo-cert \
       --domains=rollout-demo.endpoints.${PROJECT_ID}.cloud.goog \

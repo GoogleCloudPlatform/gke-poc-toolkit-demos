@@ -19,7 +19,13 @@ echo "SYNC_REPO: ${SYNC_REPO}"
 
 ### ArgoCD Install###
 echo "Setting up ArgoCD on the mccp cluster including configure it for GKE Ingress."
-gcloud compute addresses create argocd-ip --global --project ${PROJECT_ID}
+echo "Creating a global public IP for the ArgoCD."
+if [[ $(gcloud compute addresses describe argocd-ip --project ${PROJECT_ID}) ]]; then
+  echo "ArgoCD IP already exists."
+else
+  echo "Creating ArgoCD IP."
+  gcloud compute addresses create argocd-ip --global --project ${PROJECT_ID}
+fi
 export GCLB_IP=$(gcloud compute addresses describe argocd-ip --project ${PROJECT_ID} --global --format="value(address)")
 echo -e "GCLB_IP is ${GCLB_IP}"
 
@@ -91,8 +97,14 @@ EOF
 
 kubectl apply -k argo-cd-gke/overlays/gke_ingress
 SECONDS=0
+
 echo "Creating a global public IP for the ASM GW."
-gcloud compute addresses create asm-gw-ip --global --project ${PROJECT_ID}
+if [[ $(gcloud compute addresses describe asm-gw-ip --project ${PROJECT_ID}) ]]; then
+  echo "ASM GW IP already exists."
+else
+  echo "Creating ASM GW IP."
+  gcloud compute addresses create asm-gw-ip --global --project ${PROJECT_ID}
+fi
 export ASM_GW_IP=`gcloud compute addresses describe asm-gw-ip --global --format="value(address)"`
 echo -e "GCLB_IP is ${ASM_GW_IP}"
 
@@ -159,11 +171,26 @@ kubectl apply -f argo-cd-gke/overlays/gke_ingress/argocd-admin-project.yaml -n a
 ARGOCD_SECRET=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo)
 echo "Logging into to argocd."
 argocd login "argocd.endpoints.${PROJECT_ID}.cloud.goog" --username admin --password ${ARGOCD_SECRET} --grpc-web
-argocd cluster add mccp-central-01 --in-cluster --label=env="multi-cluster-controller" --grpc-web -y
+
+if [[ $(argocd cluster get mccp-central-01 --grpc-web) ]]; then
+  echo "The mccp-central-01 cluster is already registered to ArgoCD."
+else
+  echo "Adding the mccp-central-01 cluster to ArgoCD."
+  argocd cluster add mccp-central-01 --in-cluster --label=env="multi-cluster-controller" --grpc-web -y
+fi
+
 cd argo-repo-sync 
 git init
-gh repo create ${SYNC_REPO} --private --source=. --remote=upstream
+
 REPO="https://github.com/"$(gh repo list | grep ${SYNC_REPO} | awk '{print $1}')
+
+if [[ ${REPO} != "https://github.com/" ]]; then
+  echo "${SYNC_REPO} repo already exists in github."
+else
+  echo "Creating repo ${SYNC_REPO} in github."
+  gh repo create ${SYNC_REPO} --private --source=. --remote=upstream
+  REPO="https://github.com/"$(gh repo list | grep ${SYNC_REPO} | awk '{print $1}')
+fi
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
     find ./ -type f -exec sed -i '' -e "s/{{GKE_PROJECT_ID}}/${PROJECT_ID}/g" {} +
@@ -191,7 +218,12 @@ git add . && git commit -m "Setup wave-two branch."
 git push -u origin wave-two
 git checkout main
 
-argocd repo add ${REPO} --username doesnotmatter --password ${PAT_TOKEN} --grpc-web
+if [[ $(argocd repo get mccp-central-01 --grpc-web) ]]; then
+  echo "${REPO} connection already exists."
+else
+  echo "Adding ${REPO} connection to ArgoCD."
+  argocd repo add ${REPO} --username doesnotmatter --password ${PAT_TOKEN} --grpc-web
+fi
 
 ### Setup applicationsets ###
 kubectl apply -f generators/ -n argocd --context mccp-central-01
