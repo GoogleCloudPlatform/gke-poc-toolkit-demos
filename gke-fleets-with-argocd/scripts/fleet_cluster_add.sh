@@ -101,6 +101,8 @@ kubectx ${CLUSTER_NAME}=gke_${PROJECT_ID}_${CLUSTER_LOCATION}_${CLUSTER_NAME}
 kubectl create ns tools --context ${CLUSTER_NAME}
 kubectl create ns asm-gateways --context ${CLUSTER_NAME}
 kubectl create ns istio-system --context ${CLUSTER_NAME}
+kubectl create ns prod-tools --context ${CLUSTER_NAME}
+gcloud projects add-iam-policy-binding ${PROJECT_ID} --role roles/monitoring.viewer --member "serviceAccount:${PROJECT_ID}.svc.id.goog[prod-tools/default]"
 
 openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 \
 -subj "/CN=frontend.endpoints.${PROJECT_ID}.cloud.goog/O=Edge2Mesh Inc" \
