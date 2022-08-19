@@ -239,5 +239,8 @@ gcloud projects add-iam-policy-binding ${PROJECT_ID} --member "serviceAccount:ar
 gcloud iam service-accounts add-iam-policy-binding --role roles/iam.workloadIdentityUser --member "serviceAccount:${PROJECT_ID}.svc.id.goog[argocd/argocd-server]" argocd-fleet-admin@${PROJECT_ID}.iam.gserviceaccount.com --project ${PROJECT_ID}
 gcloud iam service-accounts add-iam-policy-binding --role roles/iam.workloadIdentityUser --member "serviceAccount:${PROJECT_ID}.svc.id.goog[argocd/argocd-application-controller]" argocd-fleet-admin@${PROJECT_ID}.iam.gserviceaccount.com --project ${PROJECT_ID}
 
+gcloud container fleet ingress disable -q
+gcloud container fleet ingress enable --config-membership mccp-central-01-membership -q
+
 echo "The Fleet has been configured, checkout the sync status here:"
 echo "https://argocd.endpoints.${PROJECT_ID}.cloud.goog"
