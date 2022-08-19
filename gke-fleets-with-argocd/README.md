@@ -182,7 +182,7 @@ So far we have added an application cluster to the Fleet and new apps to those c
 
 1. **Run the team_app_add script**
 ```bash
-./scripts/team_app_add.sh -a rollout-demo -i "argoproj/rollouts-demo:green" -p ${GKE_PROJECT_ID} -t team-1 -h "rollout-demo.endpoints.argo-spike.cloud.goog"
+./scripts/team_app_add.sh -a rollout-demo -i "argoproj/rollouts-demo:green" -p ${GKE_PROJECT_ID} -t team-1 -h "rollout-demo.endpoints.${GKE_PROJECT_ID}.cloud.goog"
 ```
 
 2. **Release a new image of your app to wave one clusters**
