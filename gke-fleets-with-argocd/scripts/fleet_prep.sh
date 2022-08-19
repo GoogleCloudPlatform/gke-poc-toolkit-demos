@@ -20,7 +20,7 @@ echo "SYNC_REPO: ${SYNC_REPO}"
 ### ArgoCD Install###
 echo "Setting up ArgoCD on the mccp cluster including configure it for GKE Ingress."
 echo "Creating a global public IP for the ArgoCD."
-if [[ $(gcloud compute addresses describe argocd-ip --project ${PROJECT_ID}) ]]; then
+if [[ $(gcloud compute addresses describe argocd-ip --global --project ${PROJECT_ID}) ]]; then
   echo "ArgoCD IP already exists."
 else
   echo "Creating ArgoCD IP."
@@ -99,7 +99,7 @@ kubectl apply -k argo-cd-gke/overlays/gke_ingress
 SECONDS=0
 
 echo "Creating a global public IP for the ASM GW."
-if [[ $(gcloud compute addresses describe asm-gw-ip --project ${PROJECT_ID}) ]]; then
+if [[ $(gcloud compute addresses describe asm-gw-ip --global --project ${PROJECT_ID}) ]]; then
   echo "ASM GW IP already exists."
 else
   echo "Creating ASM GW IP."
