@@ -92,8 +92,8 @@ gke-mccp-central-01-linux-gke-toolkit-poo-6fb11d07-h6xb   Ready    <none>   11m 
 gcloud container fleet ingress update --config-membership=mccp-central-01-membership -q
 
 ## Unregister the app clusters from the Fleet
-gcloud container fleet memberships unregister gke-std-west01 --gke-cluster=us-west1/gke-std-west01 --project ${GKE_PROJECT_ID} -q
-gcloud container fleet memberships unregister gke-std-east01 --gke-cluster=us-east1/gke-std-east01 --project ${GKE_PROJECT_ID} -q
+gcloud container fleet memberships unregister gke-std-west01-membership --gke-cluster=us-west1/gke-std-west01 --project ${GKE_PROJECT_ID} -q
+gcloud container fleet memberships unregister gke-std-east01-membership --gke-cluster=us-east1/gke-std-east01 --project ${GKE_PROJECT_ID} -q
 
 ## Delete the app clusters
 gcloud container clusters delete gke-std-west01 --region us-west1 --project ${GKE_PROJECT_ID} -q --async
