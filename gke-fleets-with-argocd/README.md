@@ -40,7 +40,7 @@ curl -sLSf -o ./gkekitctl https://github.com/GoogleCloudPlatform/gke-poc-toolkit
 ./gkekitctl init
 ```
 
-2. **Clone the demo repo and copy folders the house dry configs for this demo.**
+2. **Clone the demo repo and copy folders that house dry configs for this demo.**
 ```bash
 cd ${ROOT_DIR}
 git clone https://github.com/GoogleCloudPlatform/gke-poc-toolkit-demos.git  
@@ -88,6 +88,14 @@ gke-mccp-central-01-linux-gke-toolkit-poo-6fb11d07-h6xb   Ready    <none>   11m 
 ```
 7. **Now we are going to delete the app clusters you created for a better demo flow.**
 ```bash
+## Ensure the mccp cluster is the ingress config controller
+gcloud container fleet ingress update --config-membership=mccp-central-01-membership -q
+
+## Unregister the app clusters from the Fleet
+gcloud container fleet memberships unregister gke-std-west01 --gke-cluster=us-west1/gke-std-west01 --project ${GKE_PROJECT_ID} -q
+gcloud container fleet memberships unregister gke-std-east01 --gke-cluster=us-east1/gke-std-east01 --project ${GKE_PROJECT_ID} -q
+
+## Delete the app clusters
 gcloud container clusters delete gke-std-west01 --region us-west1 --project ${GKE_PROJECT_ID} -q --async
 gcloud container clusters delete gke-std-east01 --region us-east1 --project ${GKE_PROJECT_ID} -q --async
 ```

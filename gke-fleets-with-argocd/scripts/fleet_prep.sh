@@ -19,7 +19,13 @@ echo "SYNC_REPO: ${SYNC_REPO}"
 
 ### ArgoCD Install###
 echo "Setting up ArgoCD on the mccp cluster including configure it for GKE Ingress."
-gcloud compute addresses create argocd-ip --global --project ${PROJECT_ID}
+echo "Creating a global public IP for the ArgoCD."
+if [[ $(gcloud compute addresses describe argocd-ip --project ${PROJECT_ID}) ]]; then
+  echo "ArgoCD IP already exists."
+else
+  echo "Creating ArgoCD IP."
+  gcloud compute addresses create argocd-ip --global --project ${PROJECT_ID}
+fi
 export GCLB_IP=$(gcloud compute addresses describe argocd-ip --project ${PROJECT_ID} --global --format="value(address)")
 echo -e "GCLB_IP is ${GCLB_IP}"
 
@@ -37,7 +43,7 @@ x-google-endpoints:
 EOF
 gcloud endpoints services deploy argocd-openapi.yaml --project ${PROJECT_ID}
 
-cat <<EOF > ${script_dir}/../argo-cd-gke/argocd-managed-cert.yaml
+cat <<EOF > ${script_dir}/../argo-cd-gke/overlays/gke_ingress/argocd-managed-cert.yaml
 apiVersion: networking.gke.io/v1
 kind: ManagedCertificate
 metadata:
@@ -48,7 +54,7 @@ spec:
   - "argocd.endpoints.${PROJECT_ID}.cloud.goog"
 EOF
 
-cat <<EOF > ${script_dir}/../argo-cd-gke/argocd-server-ingress.yaml
+cat <<EOF > ${script_dir}/../argo-cd-gke/overlays/gke_ingress/argocd-server-ingress.yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -72,7 +78,7 @@ spec:
                 number: 80
 EOF
 
-cat <<EOF > ${script_dir}/../argo-cd-gke/argocd-sa.yaml
+cat <<EOF > ${script_dir}/../argo-cd-gke/overlays/gke_ingress/argocd-sa.yaml
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -89,10 +95,16 @@ metadata:
   name: argocd-server
 EOF
 
-kubectl apply -k argo-cd-gke
+kubectl apply -k argo-cd-gke/overlays/gke_ingress
 SECONDS=0
+
 echo "Creating a global public IP for the ASM GW."
-gcloud compute addresses create asm-gw-ip --global --project ${PROJECT_ID}
+if [[ $(gcloud compute addresses describe asm-gw-ip --project ${PROJECT_ID}) ]]; then
+  echo "ASM GW IP already exists."
+else
+  echo "Creating ASM GW IP."
+  gcloud compute addresses create asm-gw-ip --global --project ${PROJECT_ID}
+fi
 export ASM_GW_IP=`gcloud compute addresses describe asm-gw-ip --global --format="value(address)"`
 echo -e "GCLB_IP is ${ASM_GW_IP}"
 
@@ -135,7 +147,7 @@ while [[ $(kubectl get managedcertificates -n argocd argocd-managed-cert -o=json
   echo "Argocd managed certificate is not yet active and it has been $SECONDS seconds since it was created."
 done
 
-cat <<EOF > argo-cd-gke/argocd-admin-project.yaml
+cat <<EOF > argo-cd-gke/overlays/gke_ingress/argocd-admin-project.yaml
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
@@ -154,16 +166,31 @@ spec:
     kind: '*'
 EOF
 
-kubectl apply -f argo-cd-gke/argocd-admin-project.yaml -n argocd --context mccp-central-01
+kubectl apply -f argo-cd-gke/overlays/gke_ingress/argocd-admin-project.yaml -n argocd --context mccp-central-01
 
 ARGOCD_SECRET=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo)
 echo "Logging into to argocd."
 argocd login "argocd.endpoints.${PROJECT_ID}.cloud.goog" --username admin --password ${ARGOCD_SECRET} --grpc-web
-argocd cluster add mccp-central-01 --in-cluster --label=env="multi-cluster-controller" --grpc-web -y
+
+if [[ $(argocd cluster get mccp-central-01 --grpc-web) ]]; then
+  echo "The mccp-central-01 cluster is already registered to ArgoCD."
+else
+  echo "Adding the mccp-central-01 cluster to ArgoCD."
+  argocd cluster add mccp-central-01 --in-cluster --label=env="multi-cluster-controller" --grpc-web -y
+fi
+
 cd argo-repo-sync 
 git init
-gh repo create ${SYNC_REPO} --private --source=. --remote=upstream
+
 REPO="https://github.com/"$(gh repo list | grep ${SYNC_REPO} | awk '{print $1}')
+
+if [[ ${REPO} != "https://github.com/" ]]; then
+  echo "${SYNC_REPO} repo already exists in github."
+else
+  echo "Creating repo ${SYNC_REPO} in github."
+  gh repo create ${SYNC_REPO} --private --source=. --remote=upstream
+  REPO="https://github.com/"$(gh repo list | grep ${SYNC_REPO} | awk '{print $1}')
+fi
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
     find ./ -type f -exec sed -i '' -e "s/{{GKE_PROJECT_ID}}/${PROJECT_ID}/g" {} +
@@ -191,7 +218,12 @@ git add . && git commit -m "Setup wave-two branch."
 git push -u origin wave-two
 git checkout main
 
-argocd repo add ${REPO} --username doesnotmatter --password ${PAT_TOKEN} --grpc-web
+if [[ $(argocd repo get mccp-central-01 --grpc-web) ]]; then
+  echo "${REPO} connection already exists."
+else
+  echo "Adding ${REPO} connection to ArgoCD."
+  argocd repo add ${REPO} --username doesnotmatter --password ${PAT_TOKEN} --grpc-web
+fi
 
 ### Setup applicationsets ###
 kubectl apply -f generators/ -n argocd --context mccp-central-01
@@ -206,14 +238,6 @@ gcloud projects add-iam-policy-binding ${PROJECT_ID} --member "serviceAccount:ar
 gcloud projects add-iam-policy-binding ${PROJECT_ID} --member "serviceAccount:argocd-fleet-admin@${PROJECT_ID}.iam.gserviceaccount.com" --role 'roles/gkehub.gatewayAdmin' --project ${PROJECT_ID}
 gcloud iam service-accounts add-iam-policy-binding --role roles/iam.workloadIdentityUser --member "serviceAccount:${PROJECT_ID}.svc.id.goog[argocd/argocd-server]" argocd-fleet-admin@${PROJECT_ID}.iam.gserviceaccount.com --project ${PROJECT_ID}
 gcloud iam service-accounts add-iam-policy-binding --role roles/iam.workloadIdentityUser --member "serviceAccount:${PROJECT_ID}.svc.id.goog[argocd/argocd-application-controller]" argocd-fleet-admin@${PROJECT_ID}.iam.gserviceaccount.com --project ${PROJECT_ID}
-
-echo "Creating certificates for whereami and rollout demo apps."
-gcloud compute ssl-certificates create whereami-cert \
-    --domains=whereami.endpoints.${PROJECT_ID}.cloud.goog \
-    --global
-gcloud compute ssl-certificates create rollout-demo-cert \
-    --domains=rollout-demo.endpoints.${PROJECT_ID}.cloud.goog \
-    --global
 
 echo "The Fleet has been configured, checkout the sync status here:"
 echo "https://argocd.endpoints.${PROJECT_ID}.cloud.goog"
