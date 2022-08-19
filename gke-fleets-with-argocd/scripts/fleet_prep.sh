@@ -207,13 +207,5 @@ gcloud projects add-iam-policy-binding ${PROJECT_ID} --member "serviceAccount:ar
 gcloud iam service-accounts add-iam-policy-binding --role roles/iam.workloadIdentityUser --member "serviceAccount:${PROJECT_ID}.svc.id.goog[argocd/argocd-server]" argocd-fleet-admin@${PROJECT_ID}.iam.gserviceaccount.com --project ${PROJECT_ID}
 gcloud iam service-accounts add-iam-policy-binding --role roles/iam.workloadIdentityUser --member "serviceAccount:${PROJECT_ID}.svc.id.goog[argocd/argocd-application-controller]" argocd-fleet-admin@${PROJECT_ID}.iam.gserviceaccount.com --project ${PROJECT_ID}
 
-echo "Creating certificates for whereami and rollout demo apps."
-gcloud compute ssl-certificates create whereami-cert \
-    --domains=whereami.endpoints.${PROJECT_ID}.cloud.goog \
-    --global
-gcloud compute ssl-certificates create rollout-demo-cert \
-    --domains=rollout-demo.endpoints.${PROJECT_ID}.cloud.goog \
-    --global
-
 echo "The Fleet has been configured, checkout the sync status here:"
 echo "https://argocd.endpoints.${PROJECT_ID}.cloud.goog"
