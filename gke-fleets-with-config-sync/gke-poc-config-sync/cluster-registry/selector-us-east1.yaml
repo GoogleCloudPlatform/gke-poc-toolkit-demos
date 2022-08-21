@@ -1,0 +1,11 @@
+kind: ClusterSelector
+apiVersion: configmanagement.gke.io/v1
+metadata:
+  name: selector-us-east1
+spec:
+  selector:
+    matchExpressions:
+      - key: location
+        operator: In
+        values:
+        - "us-east1"

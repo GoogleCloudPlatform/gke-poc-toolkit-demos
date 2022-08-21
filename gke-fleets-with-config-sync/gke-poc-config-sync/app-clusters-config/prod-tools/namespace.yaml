@@ -1,0 +1,6 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: prod-tools
+  annotations:
+    configmanagement.gke.io/cluster-selector: selector-prod

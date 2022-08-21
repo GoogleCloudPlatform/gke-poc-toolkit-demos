@@ -1,0 +1,11 @@
+kind: ClusterSelector
+apiVersion: configmanagement.gke.io/v1
+metadata:
+  name: selector-wave-two
+spec:
+  selector:
+    matchExpressions:
+      - key: wave
+        operator: In
+        values:
+        - "two"

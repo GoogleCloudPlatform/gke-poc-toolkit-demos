@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: asm-ingressgateway-xlb
+  annotations:
+    configmanagement.gke.io/cluster-selector: selector-prod
+  namespace: asm-gateways
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      asm: ingressgateway-xlb
+  template:
+    metadata:
+      annotations:
+        # This is required to tell Anthos Service Mesh to inject the gateway with the
+        # required configuration.
+        inject.istio.io/templates: gateway
+      labels:
+        asm: ingressgateway-xlb
+        # asm.io/rev: ${ASM_LABEL} # This is required only if the namespace is not labeled.
+    spec:
+      containers:
+      - name: istio-proxy
+        image: auto # The image will automatically update each time the pod starts.
+        resources:
+          limits:
+            cpu: 2000m
+            memory: 1024Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
