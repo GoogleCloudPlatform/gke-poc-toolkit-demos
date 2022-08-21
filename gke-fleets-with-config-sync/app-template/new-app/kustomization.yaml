@@ -1,0 +1,10 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: APP_NAME
+namePrefix: APP_NAME-
+resources:
+- https://github.com/GoogleCloudPlatform/gke-poc-toolkit-demos.git//gke-fleets-with-argocd/argo-repo-sync/app-template/base?ref=main
+- rollout-wave1.yaml
+- rollout-wave2.yaml
+commonLabels:
+  app: APP_NAME

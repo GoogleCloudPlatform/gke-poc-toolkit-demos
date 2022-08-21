@@ -1,0 +1,5 @@
+resources:
+- quota.yaml
+- rbac.yaml
+- service-canary.yaml
+- service-stable.yaml
