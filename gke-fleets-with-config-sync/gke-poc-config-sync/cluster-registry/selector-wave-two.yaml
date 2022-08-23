@@ -4,8 +4,5 @@ metadata:
   name: selector-wave-two
 spec:
   selector:
-    matchExpressions:
-      - key: wave
-        operator: In
-        values:
-        - "two"
+    matchLabels:
+      wave: two

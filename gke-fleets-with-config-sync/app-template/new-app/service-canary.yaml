@@ -1,7 +1,8 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: canary
+  name: APP_NAME-canary
+  namespace: APP_NAME
   annotations:
     configmanagement.gke.io/cluster-selector: selector-prod
 spec:
@@ -11,4 +12,4 @@ spec:
     protocol: TCP
     name: http
   selector:
-    app: app-name
+    app: APP_NAME

@@ -4,7 +4,7 @@ metadata:
   name: asm-ingressgateway-xlb-multicluster-ingress
   namespace: asm-gateways
   annotations:
-    networking.gke.io/static-ip: "34.117.163.119"
+    networking.gke.io/static-ip: "{{ASM_GW_IP}}"
     networking.gke.io/pre-shared-certs: "whereami-cert,rollout-demo-cert"
     configmanagement.gke.io/cluster-selector: selector-controller
 spec:

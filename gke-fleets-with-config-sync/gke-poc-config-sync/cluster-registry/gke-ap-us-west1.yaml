@@ -1,8 +1,0 @@
-kind: Cluster
-apiVersion: clusterregistry.k8s.io/v1alpha1
-metadata:
-  name: gke-ap-us-west1
-  labels:
-    environment: "prod"
-    location: "us-west1"
-    wave: "one"

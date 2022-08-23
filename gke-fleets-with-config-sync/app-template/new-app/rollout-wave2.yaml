@@ -1,7 +1,8 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Rollout
 metadata:
-  name: rollout
+  name: APP_NAME-rollout-wave-two
+  namespace: APP_NAME
   annotations:
     configmanagement.gke.io/cluster-selector: selector-wave-two
 spec:

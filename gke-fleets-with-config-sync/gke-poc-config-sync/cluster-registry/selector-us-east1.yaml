@@ -4,8 +4,5 @@ metadata:
   name: selector-us-east1
 spec:
   selector:
-    matchExpressions:
-      - key: location
-        operator: In
-        values:
-        - "us-east1"
+    matchLabels:
+      location: us-east1

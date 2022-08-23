@@ -180,16 +180,26 @@ kubectl -n asm-gateways create secret tls edge2mesh-credential \
 --key=tmp/frontend.endpoints.${PROJECT_ID}.cloud.goog.key \
 --cert=tmp/frontend.endpoints.${PROJECT_ID}.cloud.goog.crt --context ${CLUSTER_NAME}
 
-for i in `gcloud container clusters list --project ${PROJECT_ID} --format="value(name)"`; do
-    if [[ "$i" != "${CLUSTER_NAME}" ]] && [[ "$i" != "mccp-central-01" ]]; then
-        echo -e "Creating kubeconfig secret from cluster ${CLUSTER_NAME} and installing it on cluster ${i}"
-        istioctl create-remote-secret --context=${i} --name=${i} > ./tmp/secret-kubeconfig-${i}.yaml
-        kubectl apply -f ./tmp/secret-kubeconfig-${i}.yaml --context=${CLUSTER_NAME}
-    else
-        echo -e "Skipping as the current cluster ${CLUSTER_NAME} is the same as the target cluster ${i} or the mccp-central-01 cluster."
-    fi
-done
-rm -rf tmp
+cat <<EOF > mesh-config.yaml
+apiVersion: v1
+data:
+  mesh: |-
+    accessLogFile: /dev/stdout
+    multicluster_mode: connected
+    trustDomainAliases: ["${PROJECT_ID}.svc.id.goog"]
+kind: ConfigMap
+metadata:
+  name: istio-asm-managed
+  namespace: istio-system
+---
+apiVersion: v1
+data:
+kind: ConfigMap
+metadata:
+  name: asm-options
+  namespace: istio-system
+EOF
+kubectl apply -f mesh-config.yaml --context ${CLUSTER_NAME}
 
 ## Check for apps managed certs and create them if they do not exist
 if [[ $(gcloud compute ssl-certificates describe whereami-cert --project ${PROJECT_ID}) ]]; then
@@ -210,6 +220,9 @@ else
       --global
 fi
 
+rm -rf tmp
+cd gke-poc-config-sync
+
 if [[ ${CLUSTER_TYPE} == "autopilot" ]]; then
 cat <<EOF > cluster-registry/${CLUSTER_NAME}.yaml
 kind: Cluster
@@ -218,8 +231,8 @@ metadata:
   name: ${CLUSTER_NAME}
   labels:
     environment: "prod"
-    location: ${CLUSTER_LOCATION}
-    wave: ${APP_DEPLOYMENT_WAVE}
+    location: "${CLUSTER_LOCATION}"
+    wave: "${APP_DEPLOYMENT_WAVE}"
 EOF
 else
 cat <<EOF > cluster-registry/${CLUSTER_NAME}.yaml
@@ -229,8 +242,8 @@ metadata:
   name: ${CLUSTER_NAME}
   labels:
     environment: "prod"
-    location: ${REGION}
-    wave: ${APP_DEPLOYMENT_WAVE}
+    location: "${REGION}"
+    wave: "${APP_DEPLOYMENT_WAVE}"
 EOF
 fi
 

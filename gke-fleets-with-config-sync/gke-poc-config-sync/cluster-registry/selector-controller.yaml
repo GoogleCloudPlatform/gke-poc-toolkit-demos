@@ -4,8 +4,5 @@ metadata:
   name: selector-controller
 spec:
   selector:
-    matchExpressions:
-      - key: environment
-        operator: In
-        values:
-        - "controller"
+    matchLabels:
+      environment: controller

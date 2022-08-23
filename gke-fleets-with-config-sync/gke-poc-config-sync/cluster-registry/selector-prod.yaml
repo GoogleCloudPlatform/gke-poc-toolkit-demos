@@ -4,8 +4,5 @@ metadata:
   name: selector-prod
 spec:
   selector:
-    matchExpressions:
-      - key: environment
-        operator: In
-        values:
-        - "prod"
+    matchLabels:
+      environment: prod

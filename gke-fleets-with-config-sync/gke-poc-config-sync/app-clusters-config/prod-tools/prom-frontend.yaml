@@ -38,7 +38,7 @@ spec:
         image: "gke.gcr.io/prometheus-engine/frontend:v0.4.1-gke.0"
         args:
         - "--web.listen-address=:9090"
-        - "--query.project-id=fleets-acm-demo00"
+        - "--query.project-id={{GKE_PROJECT_ID}}"
         ports:
         - name: web
           containerPort: 9090
@@ -59,6 +59,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: prometheus-frontend
+  namespace: prod-tools
 spec:
   clusterIP: None
   selector:
