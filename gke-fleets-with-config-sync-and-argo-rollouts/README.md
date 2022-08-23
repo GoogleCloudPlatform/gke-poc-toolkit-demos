@@ -1,4 +1,4 @@
-# 🚲 GKE Poc Toolkit Demo: GKE Fleet setup with ArgoCD
+# 🚲 GKE Poc Toolkit Demo: GKE Fleet setup with ConfigSync and Argo Rollouts
 This demo shows you how to bootstrap a Fleet of GKE clusters using Config Sync as your gitops engine and Argo Rollouts to progressively release app updates.
 Services in play:
 * [ConfigSync](https://cloud.google.com/anthos-config-management/docs/config-sync-overview)
