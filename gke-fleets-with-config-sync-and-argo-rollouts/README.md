@@ -1,7 +1,7 @@
-# 🚲 GKE Poc Toolkit Demo: GKE Fleet setup with ArgoCD
-This demo shows you how to bootstrap a Fleet of GKE clusters using ArgoCD as your gitops engine.
+# 🚲 GKE Poc Toolkit Demo: GKE Fleet setup with ConfigSync and Argo Rollouts
+This demo shows you how to bootstrap a Fleet of GKE clusters using Config Sync as your gitops engine and Argo Rollouts to progressively release app updates.
 Services in play:
-* [Argocd](https://argo-cd.readthedocs.io/en/stable/)
+* [ConfigSync](https://cloud.google.com/anthos-config-management/docs/config-sync-overview)
 * [Argo Rollouts](https://argoproj.github.io/argo-rollouts/)
 * [GKE](https://cloud.google.com/kubernetes-engine/docs)
 * [Multi Cluster Services](https://cloud.google.com/kubernetes-engine/docs/concepts/multi-cluster-services)
@@ -11,16 +11,6 @@ Services in play:
 
 
 ![diagram](assets/diagram.png)
-
-## Pre-reqs
-If you don't have these tools already, please install:
-* [ArgoCD CLI](https://argo-cd.readthedocs.io/en/stable/cli_installation/)
-* Install the [Github CLI](https://github.com/cli/cli), make sure you are authenticated, and set your git defaults.
-```bash
-gh auth login
-git config --global user.email "you@example.com"
-git config --global user.name "Your Name"
-``` 
 
 ## Fleet Infra setup
 
@@ -44,8 +34,8 @@ curl -sLSf -o ./gkekitctl https://github.com/GoogleCloudPlatform/gke-poc-toolkit
 ```bash
 cd ${ROOT_DIR}
 git clone https://github.com/GoogleCloudPlatform/gke-poc-toolkit-demos.git  
-cp -rf gke-poc-toolkit-demos/gke-fleets-with-argocd/argo-repo-sync ./
-cp -rf gke-poc-toolkit-demos/gke-fleets-with-argocd/argo-cd-gke ./
+cp -rf gke-poc-toolkit-demos/gke-fleets-with-argocd/gke-poc-config-sync ./
+cp -rf gke-poc-toolkit-demos/gke-fleets-with-argocd/app-template ./
 cp -rf gke-poc-toolkit-demos/gke-fleets-with-argocd/scripts ./ 
 cp -rf gke-poc-toolkit-demos/gke-fleets-with-argocd/config.yaml ./gke-poc-toolkit/config.yaml
 rm -rf gke-poc-toolkit-demos
@@ -106,14 +96,10 @@ gcloud container clusters delete gke-std-east01 --region us-east1 --project ${GK
 So far we have the infrastructure laid out and now need to set up the multi cluster controller cluster with argocd, GKE Fleet components, and some other tooling needed for the demo. 
 
 1. **Hydrate those configs with our project specific variable by running the Fleet prep script**
-First you need to create a github PAT token with repo permissions. Here is a link that explains how. https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
 ```bash
+# Run the Fleet Prep script
 cd ${ROOT_DIR}
-# Create a var for your PAT token 
-PAT_TOKEN=""
-# Name for the private github repo that will be created
-REPO=""
-./scripts/fleet_prep.sh -p ${GKE_PROJECT_ID} -r ${REPO} -t ${PAT_TOKEN}
+./scripts/fleet_prep.sh -p ${GKE_PROJECT_ID}
 # Get your temp argocd admin password
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
 # Login to Argocd
@@ -123,24 +109,24 @@ argocd account update-password --grpc-web
 ```
 
 ## Promoting Application Clusters to the Fleet
-Now that we have the multi cluster controller cluster setup, we need to create and promote a GKE cluster to the Fleet that will run applications. Since the multi cluster networking configs have been hydrating, adding a cluster with the env=prod label on the argocd cluster secret will ensure the new cluster syncs all the baseline tooling it needs, including ASM Gateways. We have also labeled this first cluster as a wave one cluster. The wave will be leveraged once apps start getting added.
+Now that we have the multi cluster controller cluster setup, we need to create and promote a GKE cluster to the Fleet that will run applications. Since the multi cluster networking configs have been hydrating, adding a cluster with the environment=prod label in the ConfiSync cluster obect will ensure the new cluster syncs all the baseline tooling it needs, including ASM Gateways. We have also labeled this first cluster as a wave one cluster. The wave will be leveraged once apps start getting added.
 
 1. **Run the application cluster add script**
 ```bash
 ./scripts/fleet_cluster_add.sh -p ${GKE_PROJECT_ID} -n gke-ap-west01 -l us-west1 -c "172.16.10.0/28" -t "autopilot" -w one
 ```
 
-2. **Browse to the Argocd UI and you will see that the configs in subfolders in the app-clusters-config folder are installing. This state is all driven by the app clusters tooling application set which targets clusters labeled as prod.**
+2. **Browse to the ConfigSync UI and you will see that the configs in subfolders in the app-clusters-config folder are installing. This state is all driven by the app clusters tooling application set which targets clusters labeled as prod.**
 
 ## Creating a new app from the app template
-One application cluster is ready to serve apps. Now all we need to do is create configs for a new app and push them up to the Argocd sync repo and all the prep we have done will simply allow this app to start serving traffic through the ASM gateway.
+One application cluster is ready to serve apps. Now all we need to do is create configs for a new app and push them up to the ConfigSync sync repo and all the prep we have done will simply allow this app to start serving traffic through the ASM gateway.
 
 1. **Run the team_app_add script**
 ```bash
 ./scripts/team_app_add.sh -a whereami -i "gcr.io/google-samples/whereami:v1.2.6" -p ${GKE_PROJECT_ID} -t team-2 -h "whereami.endpoints.${GKE_PROJECT_ID}.cloud.goog"
 ```
 
-2. **Take a peek at the Argocd UI, filter by the team-2 project for easier location of applications, and you will see that the whereami app is starting to rollout to all application servers labeled as wave-one (there is only one at this point).**
+2. **Take a peek at the GKE workloads UI, filter by the whereami app namespaces for easier location of applications, and you will see that the whereami app is starting to rollout to all application servers labeled as wave-one (there is only one at this point).**
 
 3. **Once the whereami pods have started navigate to it's endpoint and you will see that you are routed to a pod living in the us-west region. You can also curl the endpoint to the same effect.**
 ```bash
@@ -164,7 +150,6 @@ Let's get another application cluster added to the Fleet. This time we will depl
 ```bash
 ./scripts/fleet_cluster_add.sh -p ${GKE_PROJECT_ID} -n gke-ap-east01 -l us-east1-b -c "172.16.11.0/28" -t "autopilot" -w two
 ```
-
 
 2. **Once the whereami pods have started on the us-east cluster, refresh the endpoint webpage or curl it again and you will see that you are routed to a pod living in the region that is closest to you. If you are closer to the west coast and want to see the east coast pod in action you can deploy a GCE instance in the east coast and curl from there or feel free to spin up a curl container in the us-east cluster and curl the endpoint from there.**
 ```bash

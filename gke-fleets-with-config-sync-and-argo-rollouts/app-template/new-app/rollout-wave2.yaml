@@ -1,0 +1,61 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: APP_NAME-rollout-wave-two
+  namespace: APP_NAME
+  annotations:
+    configmanagement.gke.io/cluster-selector: selector-wave-two
+spec:
+  replicas: 1
+  strategy:
+    canary:
+      canaryService: APP_NAME-canary
+      stableService: APP_NAME-stable
+      trafficRouting:
+        istio:
+          virtualServices:
+          - name: APP_NAME-virtualservice # At least one virtualService is required
+            routes:
+            - primary # At least one route is required
+      steps:
+      - setWeight: 20
+      - pause:
+          duration: 4m
+      - analysis:
+          templates:
+          - templateName: success-rate
+            clusterScope: true
+          args:
+          - name: service-name
+            value: APP_NAME-canary.APP_NAME.svc.cluster.local
+      - setWeight: 80
+      - pause:
+          duration: 4m
+      - analysis:
+          templates:
+          - templateName: success-rate
+            clusterScope: true
+          args:
+          - name: service-name
+            value: APP_NAME-canary.APP_NAME.svc.cluster.local
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: APP_NAME
+  template:
+    metadata:
+      labels:
+        app: APP_NAME
+        istio-injection: enabled
+    spec:
+      containers:
+      - name: APP_NAME
+        image: APP_IMAGE
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+        resources:
+          requests:
+            memory: 32Mi
+            cpu: 5m

@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: asm-gateways
+  annotations:
+    configmanagement.gke.io/cluster-selector: selector-prod
+  labels:
+    istio.io/rev: asm-managed

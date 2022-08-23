@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: APP_NAME
+  labels:
+    istio.io/rev: asm-managed
+  annotations:
+    configmanagement.gke.io/cluster-selector: selector-prod

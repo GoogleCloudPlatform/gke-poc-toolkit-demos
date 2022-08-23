@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: asm-ingressgateway-xlb
+  namespace: asm-gateways
+  annotations:
+    configmanagement.gke.io/cluster-selector: selector-prod
+spec:
+  type: ClusterIP
+  selector:
+    asm: ingressgateway-xlb
+  ports:
+  - port: 80
+    name: http
+  - port: 443
+    name: https
+
