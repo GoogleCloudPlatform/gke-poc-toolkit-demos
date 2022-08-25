@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: APP_NAME-quota
+  namespace: APP_NAME
+  annotations:
+    configmanagement.gke.io/cluster-selector: selector-prod
+spec:
+  hard:
+    cpu: "1000"
+    memory: 100Gi
+    pods: "100"

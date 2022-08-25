@@ -30,10 +30,3 @@ git add . && git commit -m "Removed application ${APP_NAME}."
 git push 
 
 echo "Removed application ${APP_NAME}."
-
-
-
-
-
-
-

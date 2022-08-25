@@ -34,5 +34,3 @@ elif [[ ${WAVE} == "two" ]]; then
 else
     echo "${WAVE} is an unknown wave."
 fi
-
-

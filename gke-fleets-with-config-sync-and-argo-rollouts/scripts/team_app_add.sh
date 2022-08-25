@@ -120,6 +120,3 @@ git add . && git commit -m "Added application ${APP_NAME} to team ${TEAM_NAME}."
 git push
 
 echo "Added application ${APP_NAME} to team ${TEAM_NAME} and staged for wave one and wave two clusters."
-
-
-
