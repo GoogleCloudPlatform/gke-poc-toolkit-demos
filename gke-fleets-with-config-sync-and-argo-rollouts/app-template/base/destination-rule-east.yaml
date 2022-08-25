@@ -1,10 +1,9 @@
 apiVersion: networking.istio.io/v1beta1
 kind: DestinationRule
 metadata:
-  name: APP_NAME-destrule
-  namespace: APP_NAME
+  name: east-destrule
   annotations:
-    configmanagement.gke.io/cluster-selector: selector-us-central1
+    configmanagement.gke.io/cluster-selector: selector-us-east1  
 spec:
   host: APP_NAME-stable.APP_NAME.svc.cluster.local
   trafficPolicy:
@@ -16,8 +15,8 @@ spec:
       localityLbSetting:
         enabled: true
         failover:
-          - from: us-central1
-            to: us-west1
+          - from: us-east1
+            to: us-central1
     outlierDetection:
       consecutive5xxErrors: 1
       interval: 1s

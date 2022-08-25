@@ -1,8 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: APP_NAME-stable
-  namespace: APP_NAME
+  name: stable
   annotations:
     configmanagement.gke.io/cluster-selector: selector-prod
 spec:
@@ -12,4 +11,4 @@ spec:
     protocol: TCP
     name: http
   selector:
-    app: APP_NAME
+    app: app-name

@@ -1,12 +1,11 @@
 apiVersion: networking.istio.io/v1beta1
 kind: DestinationRule
 metadata:
-  name: whereami-destrule
-  namespace: whereami
+  name: west-destrule
   annotations:
-    configmanagement.gke.io/cluster-selector: selector-us-central1
+    configmanagement.gke.io/cluster-selector: selector-us-west1
 spec:
-  host: whereami-stable.whereami.svc.cluster.local
+  host: APP_NAME-stable.APP_NAME.svc.cluster.local
   trafficPolicy:
     connectionPool:
       http:
@@ -16,8 +15,8 @@ spec:
       localityLbSetting:
         enabled: true
         failover:
-          - from: us-central1
-            to: us-west1
+          - from: us-west1
+            to: us-central1
     outlierDetection:
       consecutive5xxErrors: 1
       interval: 1s

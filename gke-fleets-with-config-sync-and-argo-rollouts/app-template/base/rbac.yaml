@@ -1,8 +1,7 @@
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: APP_NAME-rolebinding
-  namespace: APP_NAME
+  name: rolebinding
   annotations:
     configmanagement.gke.io/cluster-selector: selector-prod
 subjects:

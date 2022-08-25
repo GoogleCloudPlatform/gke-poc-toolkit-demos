@@ -33,6 +33,7 @@ curl -sLSf -o ./gkekitctl https://github.com/GoogleCloudPlatform/gke-poc-toolkit
 2. **Clone the demo repo and copy folders that house dry configs for this demo.**
 ```bash
 cd ${ROOT_DIR}
+gcloud source repos clone gke-poc-config-sync --project=$GKE_PROJECT_ID
 git clone https://github.com/GoogleCloudPlatform/gke-poc-toolkit-demos.git  
 cp -rf gke-poc-toolkit-demos/gke-fleets-with-argocd/gke-poc-config-sync ./
 cp -rf gke-poc-toolkit-demos/gke-fleets-with-argocd/app-template ./
@@ -100,12 +101,7 @@ So far we have the infrastructure laid out and now need to set up the multi clus
 # Run the Fleet Prep script
 cd ${ROOT_DIR}
 ./scripts/fleet_prep.sh -p ${GKE_PROJECT_ID}
-# Get your temp argocd admin password
-kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
-# Login to Argocd
-argocd login "argocd.endpoints.${GKE_PROJECT_ID}.cloud.goog" --username admin
-# Update your argocd admin password.
-argocd account update-password --grpc-web
+
 ```
 
 ## Promoting Application Clusters to the Fleet

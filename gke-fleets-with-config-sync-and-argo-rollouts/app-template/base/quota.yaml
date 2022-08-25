@@ -1,8 +1,7 @@
 apiVersion: v1
 kind: ResourceQuota
 metadata:
-  name: APP_NAME-quota
-  namespace: APP_NAME
+  name: quota
   annotations:
     configmanagement.gke.io/cluster-selector: selector-prod
 spec:
