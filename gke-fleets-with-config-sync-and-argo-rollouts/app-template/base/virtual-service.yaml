@@ -1,0 +1,24 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: virtualservice
+  annotations:
+    configmanagement.gke.io/cluster-selector: selector-prod
+spec:
+  gateways:
+  - asm-gateways/asm-ingress-gateway-xlb
+  hosts:
+  - APP_HOST_NAME
+  http:
+  - name: primary
+    route:
+    - destination:
+        host: APP_NAME-stable
+        port:
+          number: 80
+      weight: 100
+    - destination:
+        host: APP_NAME-canary
+        port:
+          number: 80
+      weight: 0

@@ -1,0 +1,13 @@
+apiVersion: configsync.gke.io/v1beta1
+kind: RootSync
+metadata:
+  name: root-sync
+  namespace: config-management-system
+spec:
+  sourceFormat: unstructured
+  git:
+   repo: "https://source.developers.google.com/p/{{PROJECT_ID}}/r/gke-poc-config-sync"
+     branch: "main"
+     dir: "/"
+     auth: "gcpserviceaccount"
+     gcpServiceAccountEmail: "acm-service-account@{{PROJECT_ID}}.iam.gserviceaccount.com"
