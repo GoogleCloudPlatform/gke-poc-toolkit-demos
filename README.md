@@ -6,7 +6,7 @@
 
 ![logo](assets/logo-256.png)
 
-This repository contains demos to run with [GKE PoC Toolkit](https://github.com/GoogleCloudPlatform/gke-poc-toolkit).
+### Here is a list of demos this repository contains that run with the [GKE PoC Toolkit](https://github.com/GoogleCloudPlatform/gke-poc-toolkit).
 
 - [online-boutique-single-cluster](/online-boutique-single-cluster)
 - [multi-cluster-network-resiliency](/multi-cluster-network-resiliency
