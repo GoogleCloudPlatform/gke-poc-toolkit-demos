@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- quota.yaml
+- rbac.yaml
+- service-canary.yaml
+- service-stable.yaml
+- virtual-service.yaml
+- destination-rule-central.yaml
+- destination-rule-east.yaml
+- destination-rule-west.yaml
+- rollout-wave1.yaml
+- rollout-wave2.yaml

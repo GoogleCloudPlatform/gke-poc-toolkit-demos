@@ -147,7 +147,7 @@ done
 echo "ASM MCP webhook has been created."
 
 ## Install Config Sync
-REPO=$(gcloud source repos list --format='value(URL)')
+REPO=$(gcloud source repos list --project ${PROJECT_ID} --format='value(URL)')
 cat <<EOF > tmp/config-sync.yaml
 applySpecVersion: 1
 spec:
@@ -224,7 +224,7 @@ rm -rf tmp
 cd gke-poc-config-sync
 
 if [[ ${CLUSTER_TYPE} == "autopilot" ]]; then
-cat <<EOF > cluster-registry/${CLUSTER_NAME}.yaml
+cat <<EOF > clusterregistry/${CLUSTER_NAME}.yaml
 kind: Cluster
 apiVersion: clusterregistry.k8s.io/v1alpha1
 metadata:
@@ -235,7 +235,7 @@ metadata:
     wave: "${APP_DEPLOYMENT_WAVE}"
 EOF
 else
-cat <<EOF > cluster-registry/${CLUSTER_NAME}.yaml
+cat <<EOF > clusterregistry/${CLUSTER_NAME}.yaml
 kind: Cluster
 apiVersion: clusterregistry.k8s.io/v1alpha1
 metadata:
