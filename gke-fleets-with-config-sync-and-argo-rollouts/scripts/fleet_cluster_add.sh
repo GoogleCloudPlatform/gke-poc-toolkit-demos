@@ -147,14 +147,13 @@ done
 echo "ASM MCP webhook has been created."
 
 ## Install Config Sync
-REPO=$(gcloud source repos list --project ${PROJECT_ID} --format='value(URL)')
 cat <<EOF > tmp/config-sync.yaml
 applySpecVersion: 1
 spec:
   configSync:
     enabled: true
     sourceFormat: "unstructured"
-    syncRepo: ${REPO}
+    syncRepo: "https://source.developers.google.com/p/${PROJECT_ID}/r/gke-poc-config-sync"
     syncBranch: "main"
     secretType: "gcpserviceaccount"
     gcpServiceAccountEmail: "acm-service-account@${PROJECT_ID}.iam.gserviceaccount.com"
