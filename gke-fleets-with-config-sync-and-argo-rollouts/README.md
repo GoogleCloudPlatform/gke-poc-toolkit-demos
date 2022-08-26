@@ -35,10 +35,10 @@ curl -sLSf -o ./gkekitctl https://github.com/GoogleCloudPlatform/gke-poc-toolkit
 cd ${ROOT_DIR}
 gcloud source repos clone gke-poc-config-sync --project=$GKE_PROJECT_ID
 git clone https://github.com/GoogleCloudPlatform/gke-poc-toolkit-demos.git  
-cp -rf gke-fleets-with-config-sync-and-argo-rollouts/gke-fleets-with-argocd/gke-poc-config-sync ./
-cp -rf gke-fleets-with-config-sync-and-argo-rollouts/gke-fleets-with-argocd/app-template ./
-cp -rf gke-fleets-with-config-sync-and-argo-rollouts/gke-fleets-with-argocd/scripts ./ 
-cp -rf gke-fleets-with-config-sync-and-argo-rollouts/gke-fleets-with-argocd/config.yaml ./
+cp -rf gke-poc-toolkit-demos/gke-fleets-with-config-sync-and-argo-rollouts/gke-poc-config-sync ./
+cp -rf gke-poc-toolkit-demos/gke-fleets-with-config-sync-and-argo-rollouts/app-template ./
+cp -rf gke-poc-toolkit-demos/gke-fleets-with-config-sync-and-argo-rollouts/scripts ./ 
+cp -rf gke-poc-toolkit-demos/gke-fleets-with-config-sync-and-argo-rollouts/config.yaml ./
 rm -rf gke-poc-toolkit-demos
 ```
 
