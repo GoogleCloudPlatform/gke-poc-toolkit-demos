@@ -12,4 +12,4 @@
 - [multi-cluster-network-resiliency](/multi-cluster-network-resiliency
 )
 - [GKE Fleets with ArgoCD & Argo Rollouts](/gke-fleets-with-argocd)
-- [GKE Fleets with Config Sync & Argo Rollouts](gke-fleets0with-config-sync-and-argo-rollouts)
+- [GKE Fleets with Config Sync & Argo Rollouts](gke-fleets-with-config-sync-and-argo-rollouts)
