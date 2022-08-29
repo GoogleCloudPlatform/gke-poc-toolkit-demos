@@ -101,8 +101,8 @@ So far we have the infrastructure laid out and now need to set up the multi clus
 1. **Hydrate those configs with our project specific variable by running the Fleet prep script**
 ```bash
 # Run the Fleet Prep script
-gcloud source repos clone gke-poc-config-sync --project=$GKE_PROJECT_ID
 cd ${ROOT_DIR}
+gcloud source repos clone gke-poc-config-sync --project=$GKE_PROJECT_ID
 ./scripts/fleet_prep.sh -p ${GKE_PROJECT_ID}
 
 ```
