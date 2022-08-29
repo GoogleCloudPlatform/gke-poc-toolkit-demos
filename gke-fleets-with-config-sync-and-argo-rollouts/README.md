@@ -17,7 +17,10 @@ Services in play:
 1. **Initiliaze the GKE POC Toolkit (gkekitctl init).** 
 ```bash
 export GKE_PROJECT_ID=<your-project-id>
-export OS="darwin" # choice of darwin or amd64 
+export OS="darwin" # choice of darwin or amd64
+```
+
+```bash
 gcloud config set project $GKE_PROJECT_ID
 gcloud auth login
 gcloud auth application-default login
