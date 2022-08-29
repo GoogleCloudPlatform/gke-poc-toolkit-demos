@@ -36,7 +36,6 @@ curl -sLSf -o ./gkekitctl https://github.com/GoogleCloudPlatform/gke-poc-toolkit
 2. **Clone the demo repo and copy folders that house dry configs for this demo.**
 ```bash
 cd ${ROOT_DIR}
-gcloud source repos clone gke-poc-config-sync --project=$GKE_PROJECT_ID
 git clone https://github.com/GoogleCloudPlatform/gke-poc-toolkit-demos.git  
 cp -rf gke-poc-toolkit-demos/gke-fleets-with-config-sync-and-argo-rollouts/gke-poc-config-sync ./
 cp -rf gke-poc-toolkit-demos/gke-fleets-with-config-sync-and-argo-rollouts/app-template ./
@@ -102,6 +101,7 @@ So far we have the infrastructure laid out and now need to set up the multi clus
 1. **Hydrate those configs with our project specific variable by running the Fleet prep script**
 ```bash
 # Run the Fleet Prep script
+gcloud source repos clone gke-poc-config-sync --project=$GKE_PROJECT_ID
 cd ${ROOT_DIR}
 ./scripts/fleet_prep.sh -p ${GKE_PROJECT_ID}
 
