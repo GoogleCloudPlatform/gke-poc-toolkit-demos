@@ -40,7 +40,7 @@ git clone https://github.com/GoogleCloudPlatform/gke-poc-toolkit-demos.git
 cp -rf gke-poc-toolkit-demos/gke-fleets-with-config-sync-and-argo-rollouts/gke-poc-config-sync ./
 cp -rf gke-poc-toolkit-demos/gke-fleets-with-config-sync-and-argo-rollouts/app-template ./
 cp -rf gke-poc-toolkit-demos/gke-fleets-with-config-sync-and-argo-rollouts/scripts ./ 
-cp -rf gke-poc-toolkit-demos/gke-fleets-with-config-sync-and-argo-rollouts/config.yaml ./
+cp -rf gke-poc-toolkit-demos/gke-fleets-with-config-sync-and-argo-rollouts/gke-poc-toolkit/config.yaml ./
 rm -rf gke-poc-toolkit-demos
 ```
 
