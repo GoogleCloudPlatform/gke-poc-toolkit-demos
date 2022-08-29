@@ -76,7 +76,7 @@ echo "Network tags for pod ranges are $TAGS"
 
 if [[ $(gcloud compute firewall-rules describe asm-multicluster-pods --project ${PROJECT_ID}) ]]; then
   gcloud compute firewall-rules update asm-multicluster-pods --project ${PROJECT_ID}\
-    --allow=tcp,udp,icmp,esp,ah,sctp \
+    --allow=tcp,udp,icmp,esp,ah,sctp --network=gke-poc-toolkit \
     --source-ranges="${ALL_CLUSTER_CIDRS}" \
     --target-tags=$TAGS
 else
