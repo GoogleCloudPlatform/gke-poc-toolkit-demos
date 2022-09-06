@@ -36,7 +36,7 @@ if [[ ${CLUSTER_TYPE} == "autopilot" ]]; then
     --network "argo-demo" --subnetwork ${CLUSTER_LOCATION} \
     --enable-master-authorized-networks \
     --master-authorized-networks 0.0.0.0/0 \
-    --security-group "gke-security-groups@nickeberts.altostrat.com" 
+    #  --security-group "gke-security-groups@nickeberts.altostrat.com" 
   # gcloud container clusters update ${CLUSTER_NAME} --project ${PROJECT_ID} \
   #   --region ${CLUSTER_LOCATION} \
   #   --enable-master-global-access 
@@ -57,7 +57,7 @@ else
     --labels mesh_id=proj-${PROJECT_NUMBER} \
     --autoscaling-profile optimize-utilization \
     --workload-pool "${PROJECT_ID}.svc.id.goog" \
-    --security-group "gke-security-groups@nickeberts.altostrat.com" \
+    # --security-group "gke-security-groups@nickeberts.altostrat.com" \
     --enable-image-streaming --node-locations ${CLUSTER_LOCATION}
     # --master-ipv4-cidr ${CONTROL_PLANE_CIDR} \
     # --enable-private-nodes \
