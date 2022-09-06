@@ -89,7 +89,8 @@ gke-mccp-central-01-linux-gke-toolkit-poo-12b0fa78-grhw   Ready    <none>   11m 
 gke-mccp-central-01-linux-gke-toolkit-poo-24d712a2-jm5g   Ready    <none>   11m   v1.21.6-gke.1500
 gke-mccp-central-01-linux-gke-toolkit-poo-6fb11d07-h6xb   Ready    <none>   11m   v1.21.6-gke.1500
 ```
-7. **Now we are going to delete the app clusters you created for a better demo flow.**
+7. **Now we are going to delete the app clusters you created for a better demo flow**
+   - Don't worry - we will demonstrate the use of ArgoCD to re-create these clusters in subsequent steps, as well as rolling out our applications across those clusters!
 ```bash
 ## Ensure the mccp cluster is the ingress config controller
 gcloud container fleet ingress update --config-membership=mccp-central-01-membership -q
@@ -106,7 +107,22 @@ gcloud container clusters delete gke-std-east01 --region us-east1 --project ${GK
 So far we have the infrastructure laid out and now need to set up the multi cluster controller cluster with argocd, GKE Fleet components, and some other tooling needed for the demo. 
 
 1. **Hydrate those configs with our project specific variable by running the Fleet prep script**
-First you need to create a github PAT token with repo permissions. Here is a link that explains how. https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
+First you need to create a github PAT token with repo permissions. Here is a link that explains how: https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token. 
+
+   Take a moment to familiarize yourself with the `fleet_prep.sh` script. It will perform the following steps:
+   - Reserve a static IP addresses for the ArgoCD UI
+   - Create Endpoint (i.e. a cloud.goog domain) for ArgoCD, and associate the reserved IP to that Endpoints
+   - Create Google-Managed SSL certs for the ArgoCD UI
+   - Create a GKE Ingress for ArgoCD UI referencing the previously created objects
+   - Create an argocd-fleet-admin Google Service Account
+   - Reserve a static IP address for the ASM Gatway
+   - Create Endpoints for applications (rollout-demo and whereami), and associate the reserved IP to those Endpoints
+   - Create ArgoCD AppProject object
+   - Generate an ArgoCD initial password, and add mccp-central-01 cluster to ArgoCD
+   - Hydrate configs and push to GitHub repo
+   - Specify that repo as being watched by ArgoCD
+   - Provide required IAM roles / permissions to the ArgoCD Service Account
+
 ```bash
 cd ${ROOT_DIR}
 # Create a var for your PAT token 
