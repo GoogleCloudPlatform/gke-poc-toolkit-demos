@@ -207,4 +207,11 @@ So far we have added an application cluster to the Fleet and new apps to those c
 ./scripts/team_app_rollout.sh -a rollout-demo -t team-1 -i "argoproj/rollouts-demo" -l "yellow" -w "done"
 ```
 
+## Clean-up
+The simplest way to clean up after this demo is to delete the project you used. However, before you can do this you'll need to remove the endpoints we created.
+```
+gcloud endpoints services delete argocd.endpoints.${GKE_PROJECT_ID}.cloud.goog --project=${GKE_PROJECT_ID}
+gcloud endpoints services delete rollout-demo.endpoints.${GKE_PROJECT_ID}.cloud.goog --project=${GKE_PROJECT_ID}
+gcloud endpoints services delete whereami.endpoints.${GKE_PROJECT_ID}.cloud.goog --project=${GKE_PROJECT_ID}
+```
 
