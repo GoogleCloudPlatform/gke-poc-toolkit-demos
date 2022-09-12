@@ -56,9 +56,13 @@ EOF
 gcloud endpoints services deploy whereami-openapi.yaml --project ${PROJECT_ID}
 
 cd gke-poc-config-sync
-find ./ -type f -exec sed -i '' -e "s/fleets-acm-demo00/${PROJECT_ID}/g" {} +
-find ./ -type f -exec sed -i '' -e "s/34.117.163.119/${ASM_GW_IP}/g" {} +
-# find ./ -type f -exec sed -i '' -e "s|{{SYNC_REPO}}|${REPO}|g" {} +
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    LC_ALL=C find ./ -type f -exec sed -i '' -e "s/{{GKE_PROJECT_ID}}/${PROJECT_ID}/g" {} +
+    LC_ALL=C find ./ -type f -exec sed -i '' -e "s/{{ASM_GW_IP}}/${ASM_GW_IP}/g" {} +
+else
+    find ./ -type f -exec sed -i -e "s/{{GKE_PROJECT_ID}}/${PROJECT_ID}/g" {} +
+    find ./ -type f -exec sed -i -e "s/{{ASM_GW_IP}}/${ASM_GW_IP}/g" {} +
+fi
 
 git init -b main
 git add . && git commit -m "Initial commit"
