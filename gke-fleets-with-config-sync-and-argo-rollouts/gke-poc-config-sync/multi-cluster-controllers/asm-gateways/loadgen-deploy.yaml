@@ -22,5 +22,5 @@ spec:
         command: [sh, -c, -x, -e]
         args:
         - |
-          wrk -t10 -c40 -d6h -s report.lua https://rollout-demo.endpoints.fleets-acm-demo00.cloud.goog/
+          wrk -t10 -c40 -d6h -s report.lua https://rollout-demo.endpoints.{{GKE_PROJECT_ID}}.cloud.goog/
           jq -e '.errors_ratio <= 0.05 and .latency_avg_ms < 100' report.json
