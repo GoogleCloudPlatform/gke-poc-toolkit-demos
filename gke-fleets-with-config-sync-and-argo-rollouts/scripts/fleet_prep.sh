@@ -55,6 +55,10 @@ EOF
 
 gcloud endpoints services deploy whereami-openapi.yaml --project ${PROJECT_ID}
 
+gcloud source repos clone gke-poc-config-sync --project=${PROJECT_ID}
+mv tmp/* gke-poc-config-sync
+rm -rf tmp
+
 cd gke-poc-config-sync
 if [[ "$OSTYPE" == "darwin"* ]]; then
     LC_ALL=C find ./ -type f -exec sed -i '' -e "s/{{GKE_PROJECT_ID}}/${PROJECT_ID}/g" {} +
@@ -66,6 +70,6 @@ fi
 
 git init -b main
 git add . && git commit -m "Initial commit"
-git push 
+git push origin main
 
 echo "The Fleet has been configured"

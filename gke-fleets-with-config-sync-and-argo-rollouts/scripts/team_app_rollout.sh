@@ -26,11 +26,11 @@ echo "PWD: `pwd`"
 if [[ ${WAVE} == "one" ]]; then
     sed -i '' -e "s|image: ${APP_IMAGE}:.*|image: ${APP_IMAGE}:${APP_IMAGE_TAG}|g" argoproj.io_v1alpha1_rollout_app_name-rollout-wave-one.yaml
     git add . && git commit -m "Updated application ${APP_NAME} image tag to ${APP_IMAGE}:${APP_IMAGE_TAG} on wave ${WAVE} clusters."
-    git push 
+    git push origin main
 elif [[ ${WAVE} == "two" ]]; then
     sed -i '' -e "s|image: ${APP_IMAGE}:.*|image: ${APP_IMAGE}:${APP_IMAGE_TAG}|g" argoproj.io_v1alpha1_rollout_app_name-rollout-wave-two.yaml
     git add . && git commit -m "Updated application ${APP_NAME} image tag to ${APP_IMAGE}:${APP_IMAGE_TAG} on wave ${WAVE} clusters."
-    git push 
+    git push origin main
 else
     echo "${WAVE} is an unknown wave."
 fi

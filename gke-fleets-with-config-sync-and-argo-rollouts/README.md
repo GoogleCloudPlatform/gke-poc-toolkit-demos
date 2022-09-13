@@ -102,11 +102,7 @@ So far we have the infrastructure laid out and now need to set up the multi clus
 ```bash
 # Run the Fleet Prep script
 cd ${ROOT_DIR}
-gcloud source repos clone gke-poc-config-sync --project=$GKE_PROJECT_ID
-mv tmp/* gke-poc-config-sync
-rm -rf tmp
 ./scripts/fleet_prep.sh -p ${GKE_PROJECT_ID}
-
 ```
 
 ## Promoting Application Clusters to the Fleet

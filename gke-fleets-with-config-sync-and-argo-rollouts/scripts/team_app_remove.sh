@@ -27,6 +27,6 @@ git checkout main
 rm -rf namespaces/${APP_NAME}
 
 git add . && git commit -m "Removed application ${APP_NAME}."
-git push 
+git push origin main
 
 echo "Removed application ${APP_NAME}."

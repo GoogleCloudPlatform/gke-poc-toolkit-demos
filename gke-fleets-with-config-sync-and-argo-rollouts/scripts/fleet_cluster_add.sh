@@ -246,6 +246,6 @@ metadata:
 EOF
 fi
 
-git add . && git commit -m "Added ${CLUSTER_NAME} to the cluster registry folder." && git push
+git add . && git commit -m "Added ${CLUSTER_NAME} to the cluster registry folder." && git push origin main
 
 echo "${CLUSTER_NAME} has been deployed and added to the Fleet."
