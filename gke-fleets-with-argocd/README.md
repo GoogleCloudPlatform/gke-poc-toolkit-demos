@@ -65,9 +65,9 @@ else
 fi
 ```
 
-4. **Run the gkekitctl create command from this directory.** This will take about 15 minutes to run.
+4. **Run the gkekitctl apply command from this directory.** This will take about 15 minutes to run.
 ```bash
-./gkekitctl create --config config.yaml
+./gkekitctl apply --config config.yaml
 ```
 
 5. **Connect to your newly-created GKE clusters**
