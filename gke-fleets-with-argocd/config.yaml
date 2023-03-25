@@ -28,15 +28,15 @@ clustersConfig:  # a list of one or more clusters, each with their own config
 - clusterName: "mccp-central-01"
   machineType: "e2-standard-4"
   region: "us-central1" 
-  zone: "us-central1-b"  
+  zones: ["us-central1-b"]
   subnetName: "us-central1"
 - clusterName: "gke-std-east01"
   machineType: "e2-standard-4"
   region: "us-east1" 
-  zone: "us-east1-b"  
+  zones: ["us-east1-b"]
   subnetName: "us-east1"
 - clusterName: "gke-std-west01"
   machineType: "e2-standard-4"
   region: "us-west1" 
-  zone: "us-west1-b"  
+  zones: ["us-west1-b"]
   subnetName: "us-west1"
